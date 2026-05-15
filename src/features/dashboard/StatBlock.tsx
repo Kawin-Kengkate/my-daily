@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
+import { Skeleton } from '@/components/Skeleton';
 
 export function StatBlock({
   label,
@@ -19,8 +20,8 @@ export function StatBlock({
       <div className="font-display font-bold text-label text-ink-500 uppercase">{label}</div>
       {loading ? (
         <>
-          <div className="mt-2 h-7 w-20 rounded-field bg-cream-200 animate-pulse" />
-          {hint && <div className="mt-1 h-3 w-16 rounded-field bg-cream-200 animate-pulse" />}
+          <Skeleton className="mt-2 h-7 w-20" />
+          {hint && <Skeleton className="mt-1 h-3 w-16" />}
         </>
       ) : (
         <>

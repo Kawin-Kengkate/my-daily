@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { notify } from '@/lib/notify';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/Field';
+import { TimePicker } from '@/components/TimePicker';
+import { Skeleton } from '@/components/Skeleton';
 import { useSettings, useSaveSettings } from '@/hooks/useSettings';
 
 export function SettingsPage() {
@@ -34,16 +37,25 @@ export function SettingsPage() {
   const onSave = async () => {
     try {
       await save.mutateAsync(form);
-      toast.success('Saved ✓');
+      notify.success('Saved ✓');
     } catch (e) {
-      toast.error((e as Error).message);
+      notify.error((e as Error).message);
     }
   };
 
-  if (isLoading) return <p className="font-body">Loading...</p>;
+  if (isLoading) {
+    return (
+      <div className="space-y-5 max-w-2xl mx-auto">
+        <Skeleton className="h-9 w-40" />
+        <Skeleton className="h-32" rounded="card" bordered />
+        <Skeleton className="h-32" rounded="card" bordered />
+        <Skeleton className="h-32" rounded="card" bordered />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-5 max-w-2xl">
+    <div className="space-y-5 max-w-2xl mx-auto">
       <h2 className="font-display font-extrabold text-display">Settings</h2>
 
       <Card className="p-5 space-y-4">
@@ -66,8 +78,18 @@ export function SettingsPage() {
       <Card className="p-5 space-y-4">
         <h3 className="font-display font-bold text-h4">🕐 Work hours</h3>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Start" type="time" value={form.work_start} onChange={(e) => setForm({ ...form, work_start: e.target.value })} />
-          <Field label="End" type="time" value={form.work_end} onChange={(e) => setForm({ ...form, work_end: e.target.value })} />
+          <div>
+            <label className="font-display font-bold text-label text-ink-500 uppercase">Start</label>
+            <div className="mt-1.5">
+              <TimePicker value={form.work_start} onChange={(v) => setForm({ ...form, work_start: v })} />
+            </div>
+          </div>
+          <div>
+            <label className="font-display font-bold text-label text-ink-500 uppercase">End</label>
+            <div className="mt-1.5">
+              <TimePicker value={form.work_end} onChange={(v) => setForm({ ...form, work_end: v })} />
+            </div>
+          </div>
         </div>
       </Card>
 
@@ -81,7 +103,23 @@ export function SettingsPage() {
       </Card>
 
       <Button variant="primary" size="lg" onClick={onSave} disabled={save.isPending}>
-        {save.isPending ? 'กำลังบันทึก...' : 'Save settings'}
+        {save.isPending ? (
+          <span className="inline-flex items-center gap-2">
+            กำลังบันทึก
+            <span className="inline-flex gap-1">
+              {[0, 1, 2].map((i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block w-1.5 h-1.5 rounded-full bg-paper"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.12 }}
+                />
+              ))}
+            </span>
+          </span>
+        ) : (
+          'Save settings'
+        )}
       </Button>
     </div>
   );

@@ -1,9 +1,12 @@
 import { lazy, Suspense } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'sonner';
 import { AppShell } from '@/components/layout/AppShell';
 import { LoginPage } from '@/pages/LoginPage';
+import { PageTransition } from '@/components/PageTransition';
+import { PageSkeleton } from '@/components/Skeleton';
 import { useAuth } from '@/hooks/useAuth';
 
 const DailyPage = lazy(() => import('@/pages/DailyPage').then((m) => ({ default: m.DailyPage })));
@@ -18,26 +21,35 @@ const qc = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
 });
 
-function PageFallback() {
-  return <div className="p-8 font-mono text-ink-500">โหลดหน้า…</div>;
-}
-
 function ProtectedShell() {
   const { user, loading } = useAuth();
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center font-body">Loading…</div>;
+    return <PageSkeleton />;
   }
   if (!user) return <LoginPage />;
   return <AppShell />;
+}
+
+function AnimatedOutlet() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <PageTransition key={location.pathname}>
+        <Suspense fallback={<PageSkeleton />}>
+          <Outlet />
+        </Suspense>
+      </PageTransition>
+    </AnimatePresence>
+  );
 }
 
 export default function App() {
   return (
     <QueryClientProvider client={qc}>
       <HashRouter>
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
-            <Route element={<ProtectedShell />}>
+        <Routes>
+          <Route element={<ProtectedShell />}>
+            <Route element={<AnimatedOutlet />}>
               <Route index element={<DailyPage />} />
               <Route path="daily" element={<DailyListPage />} />
               <Route path="daily/:date" element={<DailyPage />} />
@@ -48,15 +60,10 @@ export default function App() {
               <Route path="settings" element={<SettingsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
-          </Routes>
-        </Suspense>
+          </Route>
+        </Routes>
       </HashRouter>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          className: 'bg-paper border-1.5 border-ink-900 shadow-stamp font-body',
-        }}
-      />
+      <Toaster position="top-right" />
     </QueryClientProvider>
   );
 }

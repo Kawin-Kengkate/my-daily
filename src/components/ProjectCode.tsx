@@ -14,10 +14,12 @@ export type ProjectCodeColor = keyof typeof bgMap;
 export function ProjectCode({
   code,
   color = 'peri',
+  hexColor,
   className,
 }: {
   code: string;
   color?: ProjectCodeColor;
+  hexColor?: string;
   className?: string;
 }) {
   return (
@@ -26,9 +28,10 @@ export function ProjectCode({
         'inline-block px-1.5 py-0.5 rounded-chip',
         'border border-ink-900',
         'font-mono font-bold text-xs text-ink-900',
-        bgMap[color],
+        !hexColor && bgMap[color],
         className,
       )}
+      style={hexColor ? { backgroundColor: hexColor + '30' } : undefined}
     >
       {code}
     </code>

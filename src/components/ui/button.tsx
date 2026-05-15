@@ -7,12 +7,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-ink-900 text-paper border-1.5 border-ink-900 shadow-stamp-lemon',
-        tangerine: 'bg-tangerine text-paper border-1.5 border-ink-900 shadow-stamp',
-        lemon: 'bg-lemon text-ink-900 border-1.5 border-ink-900 shadow-stamp-sm',
-        paper: 'bg-paper text-ink-900 border-1.5 border-ink-900 shadow-stamp-sm',
+        primary: 'bg-ink-900 text-paper border-1.5 border-ink-900 shadow-stamp-lemon hover:bg-ink-700',
+        tangerine: 'bg-tangerine text-paper border-1.5 border-ink-900 shadow-stamp hover:brightness-110',
+        lemon: 'bg-lemon text-ink-900 border-1.5 border-ink-900 shadow-stamp-sm hover:brightness-95',
+        paper: 'bg-paper text-ink-900 border-1.5 border-ink-900 shadow-stamp-sm hover:bg-cream-50',
         ghost: 'text-ink-700 hover:bg-cream-100',
-        danger: 'bg-rose text-ink-900 border-1.5 border-ink-900 shadow-stamp-sm',
+        danger: 'bg-rose text-ink-900 border-1.5 border-ink-900 shadow-stamp-sm hover:brightness-95',
       },
       size: {
         sm: 'h-8 px-3 text-[13px] rounded-button',

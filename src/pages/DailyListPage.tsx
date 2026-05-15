@@ -6,6 +6,7 @@ import { useDaysInRange } from '@/hooks/useDay';
 import { monthRange, formatThaiDate, todayISO } from '@/lib/date';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { MonthPicker } from '@/components/MonthPicker';
 
 export function DailyListPage() {
   const [month, setMonth] = useState(() => format(new Date(), 'yyyy-MM'));
@@ -16,12 +17,7 @@ export function DailyListPage() {
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <h2 className="font-display font-extrabold text-display">Daily log</h2>
-        <input
-          type="month"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          className="h-10 px-3 bg-paper border-1.5 border-ink-900 rounded-field shadow-stamp-sm font-mono font-bold"
-        />
+        <MonthPicker value={month} onChange={setMonth} />
       </div>
       <Card>
         <div className="p-2">

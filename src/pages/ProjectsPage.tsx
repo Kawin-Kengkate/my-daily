@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Trash2, Pencil, X, Check } from 'lucide-react';
-import { toast } from 'sonner';
+import { notify } from '@/lib/notify';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,11 +52,11 @@ export function ProjectsPage() {
   const onAdd = async () => {
     const parsed = ProjectDraftSchema.safeParse(draft);
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
+      notify.error(parsed.error.issues[0].message);
       return;
     }
     if (codeTaken(parsed.data.code)) {
-      toast.error(`code "${parsed.data.code}" ซ้ำ`);
+      notify.error(`code "${parsed.data.code}" ซ้ำ`);
       return;
     }
     try {
@@ -67,9 +67,9 @@ export function ProjectsPage() {
         color: parsed.data.color,
       });
       setDraft(blankDraft);
-      toast.success('สร้างแล้ว ✓');
+      notify.success('สร้างแล้ว ✓');
     } catch (err) {
-      toast.error(friendlyDbError(err));
+      notify.error(friendlyDbError(err));
     }
   };
 
@@ -115,15 +115,15 @@ export function ProjectsPage() {
                 onToggleEdit={() => setEditId(editId === p.id ? null : p.id)}
                 onSave={async (patch) => {
                   if (patch.code && codeTaken(patch.code, p.id)) {
-                    toast.error(`code "${patch.code}" ซ้ำ`);
+                    notify.error(`code "${patch.code}" ซ้ำ`);
                     return;
                   }
                   try {
                     await upd.mutateAsync({ id: p.id, patch });
                     setEditId(null);
-                    toast.success('บันทึกแล้ว ✓');
+                    notify.success('บันทึกแล้ว ✓');
                   } catch (err) {
-                    toast.error(friendlyDbError(err));
+                    notify.error(friendlyDbError(err));
                   }
                 }}
                 onDelete={() => { if (confirm(`ลบ ${p.code}?`)) del.mutate(p.id); }}
@@ -202,7 +202,7 @@ function ProjectRow({ project: p, progress, isEditing, onToggleEdit, onSave, onD
 
   const handleSave = () => {
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
+      notify.error(parsed.error.issues[0].message);
       return;
     }
     onSave({
@@ -269,11 +269,11 @@ function ProjectRow({ project: p, progress, isEditing, onToggleEdit, onSave, onD
 
 function FieldEdit({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
-    <label className="block">
+    <div className="block">
       <span className="font-display font-bold text-label text-ink-500 uppercase">{label}</span>
       <div className="mt-1.5">{children}</div>
       {error && <span className="text-rose text-[10px] font-mono">{error}</span>}
-    </label>
+    </div>
   );
 }
 

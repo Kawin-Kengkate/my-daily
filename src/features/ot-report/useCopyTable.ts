@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { toast } from 'sonner';
+import { notify } from '@/lib/notify';
 
 export interface OTRow {
   date: string;
@@ -19,9 +19,9 @@ export function useCopyTable() {
       .join('\n');
     try {
       await navigator.clipboard.writeText(header + '\n' + body);
-      toast.success(`คัดลอก ${rows.length} rows แล้ว — paste ใน Excel ได้เลย`);
+      notify.success(`คัดลอก ${rows.length} rows แล้ว — paste ใน Excel ได้เลย`);
     } catch {
-      toast.error('clipboard ไม่ทำงาน — ลองอีกครั้ง');
+      notify.error('clipboard ไม่ทำงาน — ลองอีกครั้ง');
     }
   }, []);
 }

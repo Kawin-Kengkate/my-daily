@@ -11,6 +11,7 @@ import { useProjects } from '@/hooks/useProjects';
 import { monthRange } from '@/lib/date';
 import { calculateOT } from '@/lib/ot';
 import { formatMoney, formatHours } from '@/lib/format';
+import { MonthPicker } from '@/components/MonthPicker';
 
 export function MonthlyDashboardPage() {
   const [month, setMonth] = useState(() => format(new Date(), 'yyyy-MM'));
@@ -38,12 +39,7 @@ export function MonthlyDashboardPage() {
     <div className="space-y-5">
       <div className="flex items-center gap-3">
         <h2 className="font-display font-extrabold text-display">Monthly</h2>
-        <input
-          type="month"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          className="h-10 px-3 bg-paper border-1.5 border-ink-900 rounded-field shadow-stamp-sm font-mono font-bold"
-        />
+        <MonthPicker value={month} onChange={setMonth} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -57,7 +53,7 @@ export function MonthlyDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <Card className="p-5 lg:col-span-2">
           <h3 className="font-display font-bold text-h4 mb-3">Calendar</h3>
-          <CalendarHeatmap yyyymm={month} days={days} />
+          <CalendarHeatmap yyyymm={month} days={days} projects={projects} />
         </Card>
         <Card className="p-5">
           <h3 className="font-display font-bold text-h4 mb-3">Projects touched</h3>

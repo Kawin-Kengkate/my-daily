@@ -129,6 +129,19 @@ npm test
 
 **Supabase migration error: `auth.users` table not found:** Supabase สร้าง schema `auth` อัตโนมัติ — ถ้า error ลอง run migration ใน SQL editor ของ Supabase (ไม่ใช่ local psql)
 
-**Login redirect ไม่กลับมา:** เช็ค `redirectTo: window.location.origin` ใน `useAuth.ts` — ต้องตรงกับ Supabase Auth → URL Configuration → Site URL
+**Login redirect ไม่กลับมา / เด้งไป localhost หลัง deploy Vercel:**
+
+อาการ: หลัง deploy ขึ้น Vercel แล้ว login Google → redirect ไป `http://localhost:3000/?error=invalid_request&error_code=bad_oauth_state&error_description=OAuth+state+not+found+or+expired`
+
+สาเหตุ: Supabase fallback ไป **Site URL** เมื่อ redirect URL ที่ส่งมาไม่อยู่ใน allow-list — state ถูก save ใน localStorage ของ domain Vercel แต่ callback เด้งไป localhost → คนละ domain → อ่าน state ไม่เจอ
+
+แก้ใน **Supabase Dashboard → Authentication → URL Configuration**:
+
+1. **Site URL** → ตั้งเป็น production URL เช่น `https://your-app.vercel.app` (ไม่ใช่ `localhost`)
+2. **Redirect URLs** (allow-list) → เพิ่มทั้งหมดที่ใช้:
+   - `https://your-app.vercel.app/**` — production
+   - `http://localhost:5173/**` — Vite dev (port default ของ Vite ไม่ใช่ 3000)
+   - `https://*-<vercel-team>.vercel.app/**` — preview deployments ถ้าใช้
+3. โค้ดส่ง `redirectTo: window.location.origin` อยู่แล้ว ([useAuth.ts:39](src/hooks/useAuth.ts:39)) — ไม่ต้องแก้
 
 **OT คำนวณเพี้ยน:** ใช้ `npm test` ก่อน — case ใน `ot.test.ts` ครอบ scenarios จาก CONTEXT.md หมดแล้ว ถ้า logic ต้องปรับ — แก้ `src/lib/ot.ts` (pure function) แล้ว test ใหม่

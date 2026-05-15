@@ -29,10 +29,10 @@ export function RecentProjects({ onPick }: { onPick: (project_id: string) => voi
         <button
           key={project!.id}
           onClick={() => onPick(project!.id)}
-          className="btn-press"
+          className="btn-press hover:brightness-95 transition-all rounded-chip"
           title={project!.name}
         >
-          <ProjectCode code={project!.code} />
+          <ProjectCode code={project!.code} hexColor={project!.color} />
         </button>
       ))}
     </div>

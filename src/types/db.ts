@@ -7,6 +7,12 @@ export interface Profile {
   created_at: string;
 }
 
+export interface QuickPreset {
+  label: string;
+  start_time: string;
+  end_time: string;
+}
+
 export interface UserSettings {
   user_id: string;
   salary: number;
@@ -15,6 +21,7 @@ export interface UserSettings {
   ot_rate_weekday: number;
   ot_rate_holiday_day: number;
   ot_rate_holiday_night: number;
+  quick_presets: QuickPreset[] | null;
   updated_at: string;
 }
 

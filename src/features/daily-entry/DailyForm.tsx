@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { toast } from 'sonner';
-import { Trash2, Plus, Copy } from 'lucide-react';
+import { notify } from '@/lib/notify';
+import { formatDistanceToNow } from 'date-fns';
+import { th } from 'date-fns/locale';
+import { Trash2, Plus, Copy, CheckCircle2 } from 'lucide-react';
 import { DatePopover } from '@/components/DatePopover';
 import { MobileDateStrip } from './MobileDateStrip';
 import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { LocationToggle } from './LocationToggle';
+import { ProgressPicker } from './ProgressPicker';
+import { ProjectPicker } from './ProjectPicker';
 import { Card } from '@/components/ui/card';
 import { Sticker } from '@/components/Sticker';
+import { TimePicker } from '@/components/TimePicker';
 import { RecentProjects } from './RecentProjects';
 import { QuickPresets, type PresetBlock } from './QuickPresets';
 import { useDay, useSaveDay } from '@/hooks/useDay';
@@ -18,7 +23,6 @@ import { calculateOT } from '@/lib/ot';
 import { formatMoney, formatHours, friendlyDbError } from '@/lib/format';
 import { formatThaiDate, addDays, toISO, fromISO } from '@/lib/date';
 import { entryErrors } from '@/lib/schemas';
-import { cn } from '@/lib/utils';
 import type { LocationKind } from '@/types/db';
 
 interface EntryDraft {
@@ -30,15 +34,6 @@ interface EntryDraft {
   next_note: string;
 }
 
-const LOCATIONS: { value: LocationKind; label: string }[] = [
-  { value: 'onsite', label: 'Onsite' },
-  { value: 'wfh', label: 'WFH' },
-  { value: 'leave', label: 'ลา' },
-  { value: 'training', label: 'Training' },
-  { value: 'holiday', label: 'Holiday' },
-];
-
-const PROGRESS_PRESETS = ['0%', '10%', '30%', '50%', '70%', '90%', 'complete'];
 
 function blankEntry(prevEnd?: string): EntryDraft {
   const start = prevEnd ?? '08:00';
@@ -104,6 +99,11 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
   }, [entries, isHoliday, location, settings]);
 
   const holidayName = getHolidayName(dateISO);
+  const isSaved = !!day?.id;
+  const savedAgo = day?.updated_at
+    ? formatDistanceToNow(new Date(day.updated_at), { addSuffix: true, locale: th })
+    : null;
+  const entryCount = day?.entries?.length ?? 0;
 
   const handleSave = async () => {
     if (skipEntries) {
@@ -115,18 +115,18 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           note: note || null,
           entries: [],
         });
-        toast.success('บันทึกแล้ว ✓');
+        notify.success('บันทึกแล้ว ✓');
       } catch (err) {
-        toast.error(friendlyDbError(err, 'บันทึกไม่สำเร็จ'));
+        notify.error(friendlyDbError(err, 'บันทึกไม่สำเร็จ'));
       }
       return;
     }
     if (entries.length === 0) {
-      toast.error('ใส่ entry อย่างน้อย 1 อันก่อนบันทึก');
+      notify.error('ใส่ entry อย่างน้อย 1 อันก่อนบันทึก');
       return;
     }
     if (hasErrors) {
-      toast.error('แก้ error ในฟอร์มก่อน');
+      notify.error('แก้ error ในฟอร์มก่อน');
       return;
     }
     try {
@@ -144,9 +144,9 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           next_note: e.next_note.trim() || null,
         })),
       });
-      toast.success('บันทึกแล้ว ✓');
+      notify.success('บันทึกแล้ว ✓');
     } catch (err) {
-      toast.error('save error: ' + (err as Error).message);
+      notify.error('save error: ' + (err as Error).message);
     }
   };
 
@@ -180,21 +180,27 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
 
   return (
     <div ref={formRef} className="space-y-4">
-      <div className="hidden md:flex items-center justify-between flex-wrap gap-2">
+      <div className="hidden md:flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <Button variant="paper" size="sm" onClick={() => navDate(-1)}>← Prev</Button>
           <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
           <Button variant="paper" size="sm" onClick={() => navDate(1)}>Next →</Button>
-          <span className="font-display font-bold text-h4 ml-2">{formatThaiDate(dateISO, 'EEEE d MMMM yyyy')}</span>
+          <span className="font-display font-bold text-h4 ml-2 leading-none">{formatThaiDate(dateISO, 'EEEE d MMMM yyyy')}</span>
+          <span className="ml-3 inline-flex items-center">
+            <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
+          </span>
         </div>
         {holidayName && <Sticker color="lemon" rotate={-3}>🎉 {holidayName}</Sticker>}
         {!holidayName && isHoliday && <Sticker color="lemon" rotate={-3}>วันหยุด</Sticker>}
       </div>
 
       <div className="md:hidden space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="font-display font-bold text-h4">{formatThaiDate(dateISO, 'EEE d MMM yy')}</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-display font-bold text-h4 leading-none">{formatThaiDate(dateISO, 'EEE d MMM yy')}</span>
           <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
+        </div>
+        <div className="flex items-center">
+          <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
         </div>
         <MobileDateStrip dateISO={dateISO} onPick={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
         {(holidayName || isHoliday) && (
@@ -204,12 +210,10 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
 
       <Card>
         <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <label className="block">
+          <div className="block">
             <span className="font-display font-bold text-label text-ink-500 uppercase">Location</span>
-            <Select className="mt-1.5 w-full" value={location} onChange={(e) => setLocation(e.target.value as LocationKind)}>
-              {LOCATIONS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
-            </Select>
-          </label>
+            <LocationToggle className="mt-1.5" value={location} onChange={setLocation} />
+          </div>
           <label className="flex items-center gap-2 mt-6">
             <input
               type="checkbox"
@@ -280,7 +284,6 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
 
           {entries.map((e, idx) => {
             const err = errors[idx] ?? {};
-            const errCls = (k: string) => err[k] ? 'border-rose ring-1 ring-rose' : '';
             return (
             <div
               key={idx}
@@ -288,46 +291,36 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
               className="grid grid-cols-12 gap-2 items-start bg-cream-50 border-1.5 border-ink-900 rounded-card p-3 shadow-stamp-sm"
             >
               <div className="col-span-3 md:col-span-2 flex flex-col gap-0.5">
-                <input
-                  type="time"
+                <TimePicker
                   value={e.start_time}
-                  onChange={(ev) => setEntries(entries.map((x, i) => i === idx ? { ...x, start_time: ev.target.value } : x))}
-                  className={cn('h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-sm font-bold', errCls('start_time'))}
+                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, start_time: v } : x))}
+                  error={!!err.start_time}
                 />
                 {err.start_time && <span className="text-rose text-[10px] font-mono">{err.start_time}</span>}
               </div>
               <div className="col-span-3 md:col-span-2 flex flex-col gap-0.5">
-                <input
-                  type="time"
+                <TimePicker
                   value={e.end_time}
-                  onChange={(ev) => setEntries(entries.map((x, i) => i === idx ? { ...x, end_time: ev.target.value } : x))}
-                  className={cn('h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-sm font-bold', errCls('end_time'))}
+                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, end_time: v } : x))}
+                  error={!!err.end_time}
                 />
                 {err.end_time && <span className="text-rose text-[10px] font-mono">{err.end_time}</span>}
               </div>
               <div className="col-span-6 md:col-span-3 flex flex-col gap-0.5">
-                <Select
-                  className={cn('w-full h-9', errCls('project_id'))}
+                <ProjectPicker
                   value={e.project_id}
-                  onChange={(ev) => setEntries(entries.map((x, i) => i === idx ? { ...x, project_id: ev.target.value } : x))}
-                >
-                  <option value="">-- เลือกโปรเจค --</option>
-                  {projects.map((p) => <option key={p.id} value={p.id}>{p.code} — {p.name}</option>)}
-                </Select>
+                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, project_id: v } : x))}
+                  projects={projects}
+                  error={!!err.project_id}
+                />
                 {err.project_id && <span className="text-rose text-[10px] font-mono">{err.project_id}</span>}
               </div>
               <div className="col-span-6 md:col-span-2 flex flex-col gap-0.5">
-                <input
-                  list={`progress-${idx}`}
+                <ProgressPicker
                   value={e.progress}
-                  onChange={(ev) => setEntries(entries.map((x, i) => i === idx ? { ...x, progress: ev.target.value } : x))}
-                  onBlur={(ev) => setEntries(entries.map((x, i) => i === idx ? { ...x, progress: ev.target.value.trim() } : x))}
-                  className={cn('h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-sm font-bold', errCls('progress'))}
-                  placeholder="30%"
+                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, progress: v } : x))}
+                  error={!!err.progress}
                 />
-                <datalist id={`progress-${idx}`}>
-                  {PROGRESS_PRESETS.map((p) => <option key={p} value={p} />)}
-                </datalist>
                 {err.progress && <span className="text-rose text-[10px] font-mono">{err.progress}</span>}
               </div>
               <div className="col-span-11 md:col-span-2">
@@ -374,7 +367,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
             onClick={handleSave}
             disabled={saveDay.isPending || (!skipEntries && hasErrors)}
           >
-            {saveDay.isPending ? 'กำลังบันทึก...' : 'Save day ✓ (Ctrl+Enter)'}
+            {saveDay.isPending ? 'กำลังบันทึก...' : 'Save day ✓'}
           </Button>
         </div>
       </div>
@@ -397,5 +390,32 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+function SavedBadge({
+  isSaved,
+  savedAgo,
+  entryCount,
+}: {
+  isSaved: boolean;
+  savedAgo: string | null;
+  entryCount: number;
+}) {
+  if (!isSaved) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-1.5 border-dashed border-ink-300 bg-cream-50 font-mono text-[11px] text-ink-500">
+        <span className="h-1.5 w-1.5 rounded-full bg-ink-300" />
+        ยังไม่ได้บันทึก
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-1.5 border-ink-900 bg-mint-soft shadow-stamp-sm font-mono text-[11px] text-ink-900 leading-none">
+      <CheckCircle2 size={13} className="text-ink-900 shrink-0" />
+      <span className="font-bold">บันทึกแล้ว</span>
+      {entryCount > 0 && <span className="text-ink-700">· {entryCount} entry</span>}
+      {savedAgo && <span className="text-ink-500 hidden sm:inline">· {savedAgo}</span>}
+    </span>
   );
 }
