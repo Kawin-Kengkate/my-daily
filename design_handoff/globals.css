@@ -1,0 +1,131 @@
+/**
+ * globals.css — CSS variables + fonts + base layer
+ *
+ * Append to your existing `src/globals.css` (or whatever entry your Tailwind
+ * builds from). Keep the shadcn `@tailwind base/components/utilities` lines
+ * above this block.
+ */
+
+/* Fonts — put in <head> or @import at top of CSS */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@10..48,400..800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --cream-50:  #FBF6EC;
+    --cream-100: #F5EFE4;
+    --cream-200: #ECE3D2;
+    --cream-300: #DCCFB6;
+    --paper:     #FFFCF5;
+
+    /* Ink */
+    --ink-200: #C6CDDB;
+    --ink-300: #9AA6B8;
+    --ink-500: #5C6A80;
+    --ink-700: #2A3A52;
+    --ink-900: #0F1B2D;
+
+    /* Accents (each accent = a semantic role; see DESIGN.md §2) */
+    --tangerine:      #FF6B35;
+    --tangerine-soft: #FFD8C7;
+    --lemon:          #F7C548;
+    --lemon-soft:     #FCEDBD;
+    --mint:           #4FB389;
+    --mint-soft:      #C8E8D7;
+    --peri:           #6B7FE8;
+    --peri-soft:      #D7DCFA;
+    --rose:           #F291A6;
+    --rose-soft:      #FBD7DE;
+
+    /* Shadow recipes */
+    --shadow-stamp:    4px 4px 0 0 var(--ink-900);
+    --shadow-stamp-sm: 2px 2px 0 0 var(--ink-900);
+    --shadow-stamp-3:  3px 3px 0 0 var(--ink-900);
+    --shadow-stamp-cta-lemon:     4px 4px 0 0 var(--lemon);
+    --shadow-stamp-cta-tangerine: 4px 4px 0 0 var(--tangerine);
+    --shadow-soft: 0 8px 24px -8px rgba(15,27,45,0.18);
+
+    /* shadcn compatibility — map shadcn vars to our palette
+       (only override if you're using shadcn defaults; otherwise leave) */
+    --background: 36 60% 94%;          /* cream-100 */
+    --foreground: 218 51% 12%;         /* ink-900 */
+    --card: 42 100% 99%;               /* paper */
+    --card-foreground: 218 51% 12%;
+    --popover: 42 100% 99%;
+    --popover-foreground: 218 51% 12%;
+    --primary: 218 51% 12%;            /* ink-900 buttons */
+    --primary-foreground: 42 100% 99%;
+    --secondary: 36 50% 88%;
+    --secondary-foreground: 218 51% 12%;
+    --muted: 36 50% 88%;
+    --muted-foreground: 219 17% 43%;
+    --accent: 15 100% 60%;             /* tangerine */
+    --accent-foreground: 42 100% 99%;
+    --destructive: 348 80% 76%;        /* rose */
+    --destructive-foreground: 218 51% 12%;
+    --border: 218 51% 12%;             /* ALL borders are ink-900 by design */
+    --input: 218 51% 12%;
+    --ring: 15 100% 60%;
+    --radius: 0.625rem;                /* 10px — field radius */
+  }
+
+  html, body {
+    background: var(--cream-100);
+    color: var(--ink-900);
+    font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;
+  }
+}
+
+/* Utility helpers used in mockups — port to plain Tailwind once on shadcn */
+@layer utilities {
+  /* Squiggly underline for highlighted headline words. Use as:
+     <span class="hl-squiggle">highlight</span> */
+  .hl-squiggle {
+    position: relative;
+    display: inline-block;
+  }
+  .hl-squiggle::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -8px;
+    height: 14px;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 18' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><path d='M 4 12 Q 50 2 100 8 T 196 6' stroke='%23F7C548' stroke-width='5' fill='none' stroke-linecap='round'/></svg>");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  /* Lemon highlight block (boxed) — use as:
+     <span class="hl-box">หมุน</span>  */
+  .hl-box {
+    position: relative;
+    display: inline-block;
+    z-index: 0;
+  }
+  .hl-box::before {
+    content: '';
+    position: absolute;
+    inset: 4px -8px;
+    background: var(--lemon);
+    border-radius: 8px;
+    z-index: -1;
+    transform: rotate(-1deg);
+  }
+
+  /* Pressable feel — "click absorbs the shadow" */
+  .btn-press {
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+  .btn-press:active {
+    transform: translate(1px, 1px);
+    box-shadow: none !important;
+  }
+
+  /* Diagonal stripe fill — used for "break" segment in work-hours timeline */
+  .stripes-cream {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--cream-200) 0 4px,
+      var(--cream-300) 4px 8px
+    );
+  }
+}

@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --cream-50:  #FBF6EC;
+    --cream-100: #F5EFE4;
+    --cream-200: #ECE3D2;
+    --cream-300: #DCCFB6;
+    --paper:     #FFFCF5;
+
+    --ink-200: #C6CDDB;
+    --ink-300: #9AA6B8;
+    --ink-500: #5C6A80;
+    --ink-700: #2A3A52;
+    --ink-900: #0F1B2D;
+
+    --tangerine:      #FF6B35;
+    --tangerine-soft: #FFD8C7;
+    --lemon:          #F7C548;
+    --lemon-soft:     #FCEDBD;
+    --mint:           #4FB389;
+    --mint-soft:      #C8E8D7;
+    --peri:           #6B7FE8;
+    --peri-soft:      #D7DCFA;
+    --rose:           #F291A6;
+    --rose-soft:      #FBD7DE;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    background: var(--cream-100);
+    color: var(--ink-900);
+    font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  .btn-press {
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+  .btn-press:active {
+    transform: translate(1px, 1px);
+    box-shadow: none !important;
+  }
+  .stripes-cream {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--cream-200) 0 4px,
+      var(--cream-300) 4px 8px
+    );
+  }
+}

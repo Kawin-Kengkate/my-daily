@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Daily — Hi-fi design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@10..48,400..800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <style>
+    html, body { margin: 0; padding: 0; background: #e7e2d6; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #0F1B2D; }
+    #root { width: 100vw; height: 100vh; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="src/shared.jsx"></script>
+  <script type="text/babel" src="src/Login.jsx"></script>
+  <script type="text/babel" src="src/DailyEntry.jsx"></script>
+  <script type="text/babel" src="src/DailyEntrySat.jsx"></script>
+  <script type="text/babel" src="src/Dashboard.jsx"></script>
+  <script type="text/babel" src="src/OTTable.jsx"></script>
+  <script type="text/babel" src="src/Projects.jsx"></script>
+  <script type="text/babel" src="src/Settings.jsx"></script>
+  <script type="text/babel" src="src/BrandSystem.jsx"></script>
+
+  <script type="text/babel">
+    const { DesignCanvas, DCSection, DCArtboard } = window;
+
+    function App() {
+      return (
+        <DesignCanvas>
+          <DCSection id="brand" title="00 · Brand & system" subtitle="Type, color, stickers — the playful kit ที่ทุกหน้าใช้ร่วมกัน">
+            <DCArtboard id="brand" label="Brand reference" width={1280} height={740}>
+              <BrandSystem />
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="mobile" title="01 · Mobile — daily entry" subtitle="กรอกเร็ว · กดน้อย · เห็น OT ทันที">
+            <DCArtboard id="login" label="Login · whitelist Google" width={390} height={844}>
+              <LoginScreen />
+            </DCArtboard>
+            <DCArtboard id="entry-wd" label="Daily entry · weekday + OT" width={390} height={844}>
+              <DailyEntry />
+            </DCArtboard>
+            <DCArtboard id="entry-sat" label="Daily entry · Saturday (1.5x → 3x)" width={390} height={844}>
+              <DailyEntrySat />
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="dash" title="02 · Desktop — dashboard" subtitle="ภาพรวมเดือน · calendar heatmap · weekly hours · projects breakdown">
+            <DCArtboard id="dashboard" label="Dashboard · May 2026" width={1280} height={900}>
+              <Dashboard />
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="ot" title="03 · OT Table" subtitle="พร้อม copy ไปกรอกฟอร์มเบิก · summary band ด้านบน · base/1.5x/3x แยกชัด">
+            <DCArtboard id="ot" label="OT Table · May 2026" width={1280} height={900}>
+              <OTTable />
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="projects" title="04 · Projects" subtitle="จัดการ project codes · stats · sparkline ย้อน 22 สัปดาห์">
+            <DCArtboard id="projects" label="Projects (5 active + add)" width={1280} height={900}>
+              <Projects />
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="settings" title="05 · Settings" subtitle="เงินเดือน + work hours + Thai holidays · ทุก field มี hint บอก field DB">
+            <DCArtboard id="settings" label="Settings" width={1280} height={900}>
+              <Settings />
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

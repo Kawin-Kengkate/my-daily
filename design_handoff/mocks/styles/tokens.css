@@ -1,0 +1,39 @@
+/* My Daily — design tokens */
+:root {
+  /* Surfaces */
+  --cream-50: #FBF6EC;
+  --cream-100: #F5EFE4;
+  --cream-200: #ECE3D2;
+  --cream-300: #DCCFB6;
+  --paper:    #FFFCF5;
+
+  /* Ink */
+  --ink-900: #0F1B2D;
+  --ink-700: #2A3A52;
+  --ink-500: #5C6A80;
+  --ink-300: #9AA6B8;
+  --ink-200: #C6CDDB;
+
+  /* Accents */
+  --tangerine: #FF6B35;   /* OT / money / urgent */
+  --tangerine-soft: #FFD8C7;
+  --lemon: #F7C548;       /* holiday / spotlight */
+  --lemon-soft: #FCEDBD;
+  --mint:  #4FB389;       /* complete / done */
+  --mint-soft: #C8E8D7;
+  --peri:  #6B7FE8;       /* projects / info */
+  --peri-soft: #D7DCFA;
+  --rose:  #F291A6;       /* leave / soft */
+  --rose-soft: #FBD7DE;
+
+  /* Type */
+  --display: 'Bricolage Grotesque', 'IBM Plex Sans Thai', system-ui, sans-serif;
+  --body:    'IBM Plex Sans Thai', 'IBM Plex Sans', system-ui, sans-serif;
+  --mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Shadows — chunky offset + soft */
+  --shadow-stamp: 4px 4px 0 0 var(--ink-900);
+  --shadow-stamp-sm: 2px 2px 0 0 var(--ink-900);
+  --shadow-soft: 0 8px 24px -8px rgba(15,27,45,0.18);
+  --shadow-card: 0 1px 0 rgba(15,27,45,0.06), 0 8px 22px -10px rgba(15,27,45,0.18);
+}
