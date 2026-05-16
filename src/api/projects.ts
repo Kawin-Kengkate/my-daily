@@ -45,6 +45,30 @@ export async function deleteProject(id: string): Promise<void> {
   if (error) throw error;
 }
 
+/** ค่า progress ล่าสุดของแต่ละ project ก่อนวันที่ระบุ — ใช้ pre-fill ตอนเลือก project ใน DailyForm */
+export async function getLatestProgressByProject(beforeISO: string): Promise<Record<string, string>> {
+  const { data, error } = await supabase
+    .from('entries')
+    .select('project_id, progress, days!inner(date)')
+    .lt('days.date', beforeISO);
+  if (error) throw error;
+  const latestDate: Record<string, string> = {};
+  const result: Record<string, string> = {};
+  for (const row of (data ?? []) as unknown as Array<{
+    project_id: string;
+    progress: string;
+    days: { date: string } | { date: string }[];
+  }>) {
+    const date = Array.isArray(row.days) ? row.days[0]?.date : row.days?.date;
+    if (!date) continue;
+    if (!latestDate[row.project_id] || date > latestDate[row.project_id]) {
+      latestDate[row.project_id] = date;
+      result[row.project_id] = row.progress;
+    }
+  }
+  return result;
+}
+
 export interface ProgressPoint {
   date: string;
   value: number; // 0..100

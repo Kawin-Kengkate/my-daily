@@ -1,9 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { listProjects, createProject, updateProject, deleteProject, listProjectProgress } from '@/api/projects';
+import {
+  listProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+  listProjectProgress,
+  getLatestProgressByProject,
+} from '@/api/projects';
 import type { Project } from '@/types/db';
 
 export function useProjects() {
   return useQuery({ queryKey: ['projects'], queryFn: listProjects });
+}
+
+export function useLatestProgressByProject(beforeISO: string) {
+  return useQuery({
+    queryKey: ['latest-progress', beforeISO],
+    queryFn: () => getLatestProgressByProject(beforeISO),
+    staleTime: 60_000,
+  });
 }
 
 export function useProjectProgress(sinceISO: string) {

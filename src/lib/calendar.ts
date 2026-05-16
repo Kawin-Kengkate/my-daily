@@ -3,6 +3,7 @@
 
 import type { CalendarOverride } from '@/types/db';
 import { THAI_HOLIDAYS, isWeekend } from './thai-holidays';
+import { toISO, fromISO } from './date';
 
 export type DayType = 'workday' | 'holiday';
 
@@ -62,13 +63,10 @@ export function findHolidayRun(
 ): { from: string; to: string; dates: string[] } | null {
   if (!resolveIsHoliday(dateISO, overrides)) return null;
 
-  const toDate = (s: string) => new Date(s + 'T00:00:00');
-  const toISO = (d: Date) => d.toISOString().slice(0, 10);
-
-  const cur = toDate(dateISO);
+  const cur = fromISO(dateISO);
   const dates: string[] = [dateISO];
 
-  // ขยายไปทางซ้าย
+  // ขยายไปทางซ้าย — ใช้ local-TZ-safe toISO จาก lib/date (toISOString() จะเพี้ยน TZ)
   for (let i = 1; i <= maxScan; i++) {
     const d = new Date(cur);
     d.setDate(d.getDate() - i);

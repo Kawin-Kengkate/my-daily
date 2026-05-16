@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { notify } from '@/lib/notify';
 import { formatDistanceToNow } from 'date-fns';
 import { th } from 'date-fns/locale';
-import { Trash2, Plus, Copy, CheckCircle2 } from 'lucide-react';
+import { Trash2, Plus, Copy, CheckCircle2, CalendarCheck } from 'lucide-react';
 import { DatePopover } from '@/components/DatePopover';
 import { MobileDateStrip } from './MobileDateStrip';
 import { Button } from '@/components/ui/button';
@@ -18,13 +18,13 @@ import { QuickPresets, type PresetBlock } from './QuickPresets';
 import { HolidayPrefillBanner } from './HolidayPrefillBanner';
 import { MissingDaysBanner } from './MissingDaysBanner';
 import { useDay, useSaveDay } from '@/hooks/useDay';
-import { useProjects } from '@/hooks/useProjects';
+import { useProjects, useLatestProgressByProject } from '@/hooks/useProjects';
 import { useSettings } from '@/hooks/useSettings';
 import { useCalendarOverrides } from '@/hooks/useCalendarOverrides';
 import { resolveDay } from '@/lib/calendar';
 import { calculateOT } from '@/lib/ot';
 import { formatMoney, formatHours, friendlyDbError } from '@/lib/format';
-import { formatThaiDate, addDays, toISO, fromISO } from '@/lib/date';
+import { formatThaiDate, addDays, toISO, fromISO, todayISO } from '@/lib/date';
 import { entryErrors } from '@/lib/schemas';
 import type { LocationKind } from '@/types/db';
 
@@ -55,6 +55,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
   const { data: projects = [] } = useProjects();
   const { data: settings } = useSettings();
   const { map: overrides } = useCalendarOverrides();
+  const { data: latestProgress = {} } = useLatestProgressByProject(dateISO);
   const saveDay = useSaveDay();
 
   const dayInfo = useMemo(() => resolveDay(dateISO, overrides), [dateISO, overrides]);
@@ -104,6 +105,15 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       settings,
     );
   }, [entries, isHoliday, location, settings]);
+
+  /** เลือก project แล้วถ้ามี trend + progress เดิมยังเป็น default → แทนด้วยค่า trend */
+  const trendProgress = (currentProgress: string, projectId: string): string => {
+    if (!projectId) return currentProgress;
+    const latest = latestProgress[projectId];
+    if (!latest) return currentProgress;
+    if (currentProgress === '30%' || currentProgress === '') return latest;
+    return currentProgress;
+  };
 
   const totalHours = useMemo(() => {
     return entries.reduce((sum, e) => {
@@ -195,6 +205,8 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
     const d = addDays(fromISO(dateISO), delta);
     window.location.hash = `#/daily/${toISO(d)}`;
   };
+  const goToday = () => { window.location.hash = `#/daily/${todayISO()}`; };
+  const isToday = dateISO === todayISO();
 
   return (
     <div ref={formRef} className="space-y-4">
@@ -203,6 +215,11 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           <Button variant="paper" size="sm" onClick={() => navDate(-1)}>← Prev</Button>
           <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
           <Button variant="paper" size="sm" onClick={() => navDate(1)}>Next →</Button>
+          {!isToday && (
+            <Button variant="lemon" size="sm" onClick={goToday}>
+              <CalendarCheck size={14} /> Today
+            </Button>
+          )}
           <span className="font-display font-bold text-h4 ml-2 leading-none">{formatThaiDate(dateISO, 'EEEE d MMMM yyyy')}</span>
           <span className="ml-3 inline-flex items-center">
             <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
@@ -222,7 +239,14 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       <div className="md:hidden space-y-2">
         <div className="flex items-center justify-between gap-2">
           <span className="font-display font-bold text-h4 leading-none">{formatThaiDate(dateISO, 'EEE d MMM yy')}</span>
-          <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
+          <div className="flex items-center gap-1.5">
+            {!isToday && (
+              <Button variant="lemon" size="sm" onClick={goToday}>
+                <CalendarCheck size={14} /> Today
+              </Button>
+            )}
+            <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
+          </div>
         </div>
         <div className="flex items-center">
           <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
@@ -309,10 +333,20 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                 // ถ้ามี entry ว่างอยู่ก่อน → ใส่เข้า entry ล่าสุด ถ้าไม่ → สร้างใหม่
                 const lastIdx = entries.findIndex((e) => !e.project_id);
                 if (lastIdx >= 0) {
-                  setEntries(entries.map((e, i) => (i === lastIdx ? { ...e, project_id } : e)));
+                  setEntries(
+                    entries.map((e, i) =>
+                      i === lastIdx
+                        ? { ...e, project_id, progress: trendProgress(e.progress, project_id) }
+                        : e,
+                    ),
+                  );
                 } else {
                   const last = entries[entries.length - 1];
-                  setEntries([...entries, { ...blankEntry(last?.end_time), project_id }]);
+                  const base = blankEntry(last?.end_time);
+                  setEntries([
+                    ...entries,
+                    { ...base, project_id, progress: trendProgress(base.progress, project_id) },
+                  ]);
                 }
               }}
             />
@@ -338,7 +372,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       <ProjectPicker
                         value={e.project_id}
-                        onChange={(v) => update({ project_id: v })}
+                        onChange={(v) => update({ project_id: v, progress: trendProgress(e.progress, v) })}
                         projects={projects}
                         error={!!err.project_id}
                       />
@@ -414,7 +448,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                   <div className="col-span-3 flex flex-col gap-0.5">
                     <ProjectPicker
                       value={e.project_id}
-                      onChange={(v) => update({ project_id: v })}
+                      onChange={(v) => update({ project_id: v, progress: trendProgress(e.progress, v) })}
                       projects={projects}
                       error={!!err.project_id}
                     />
