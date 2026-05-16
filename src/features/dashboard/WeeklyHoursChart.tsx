@@ -1,9 +1,29 @@
 import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
+import type { TooltipProps } from 'recharts';
 import type { DayWithEntries } from '@/types/db';
 import type { OTSettings } from '@/lib/ot';
 import { calculateOT, parseHHMM } from '@/lib/ot';
 import { getISOWeek } from 'date-fns';
+
+function WeekTooltip({ active, payload, label }: TooltipProps<number, string>) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-paper border-1.5 border-ink-900 rounded-card px-3 py-2 shadow-stamp-sm font-mono text-xs">
+      <div className="font-display font-bold mb-1">{label}</div>
+      {payload.map((p) => (
+        <div key={String(p.dataKey)} className="flex items-center gap-2">
+          <span
+            className="inline-block h-2 w-2 border-1.5 border-ink-900"
+            style={{ background: p.color }}
+          />
+          <span className="text-ink-700">{p.dataKey === 'ot' ? 'OT' : 'Regular'}</span>
+          <span className="font-bold">{(p.value ?? 0).toFixed(2)}h</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /** stacked bar: regular hours + OT hours per ISO week */
 export function WeeklyHoursChart({
@@ -42,7 +62,7 @@ export function WeeklyHoursChart({
           <CartesianGrid strokeDasharray="3 3" stroke="var(--cream-300)" />
           <XAxis dataKey="week" />
           <YAxis />
-          <Tooltip />
+          <Tooltip content={<WeekTooltip />} cursor={{ fill: 'var(--cream-100)' }} />
           <Bar dataKey="regular" stackId="a" fill="var(--peri-soft)" stroke="var(--ink-900)" strokeWidth={1.5} />
           <Bar dataKey="ot" stackId="a" fill="var(--tangerine)" stroke="var(--ink-900)" strokeWidth={1.5} />
         </BarChart>

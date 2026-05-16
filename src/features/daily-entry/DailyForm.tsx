@@ -241,7 +241,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                   setEntries([...entries, blankEntry(last?.end_time)]);
                 }}
               >
-                <Plus size={14} /> Add entry
+                <Plus size={14} /> <span className="hidden sm:inline">Add entry</span>
               </Button>
               <Button
                 variant="lemon"
@@ -253,7 +253,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                   setEntries([...entries, { ...blankEntry(), start_time: last.start_time, end_time: last.end_time }]);
                 }}
               >
-                <Copy size={14} /> Duplicate time
+                <Copy size={14} /> <span className="hidden sm:inline">Duplicate time</span>
               </Button>
             </div>
           </div>
@@ -284,67 +284,133 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
 
           {entries.map((e, idx) => {
             const err = errors[idx] ?? {};
+            const update = (patch: Partial<EntryDraft>) =>
+              setEntries(entries.map((x, i) => (i === idx ? { ...x, ...patch } : x)));
             return (
-            <div
-              key={idx}
-              onFocusCapture={() => { focusIdxRef.current = idx; }}
-              className="grid grid-cols-12 gap-2 items-start bg-cream-50 border-1.5 border-ink-900 rounded-card p-3 shadow-stamp-sm"
-            >
-              <div className="col-span-3 md:col-span-2 flex flex-col gap-0.5">
-                <TimePicker
-                  value={e.start_time}
-                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, start_time: v } : x))}
-                  error={!!err.start_time}
-                />
-                {err.start_time && <span className="text-rose text-[10px] font-mono">{err.start_time}</span>}
-              </div>
-              <div className="col-span-3 md:col-span-2 flex flex-col gap-0.5">
-                <TimePicker
-                  value={e.end_time}
-                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, end_time: v } : x))}
-                  error={!!err.end_time}
-                />
-                {err.end_time && <span className="text-rose text-[10px] font-mono">{err.end_time}</span>}
-              </div>
-              <div className="col-span-6 md:col-span-3 flex flex-col gap-0.5">
-                <ProjectPicker
-                  value={e.project_id}
-                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, project_id: v } : x))}
-                  projects={projects}
-                  error={!!err.project_id}
-                />
-                {err.project_id && <span className="text-rose text-[10px] font-mono">{err.project_id}</span>}
-              </div>
-              <div className="col-span-6 md:col-span-2 flex flex-col gap-0.5">
-                <ProgressPicker
-                  value={e.progress}
-                  onChange={(v) => setEntries(entries.map((x, i) => i === idx ? { ...x, progress: v } : x))}
-                  error={!!err.progress}
-                />
-                {err.progress && <span className="text-rose text-[10px] font-mono">{err.progress}</span>}
-              </div>
-              <div className="col-span-11 md:col-span-2">
-                <input
-                  value={e.done_note}
-                  onChange={(ev) => setEntries(entries.map((x, i) => i === idx ? { ...x, done_note: ev.target.value } : x))}
-                  placeholder="ทำเสร็จ"
-                  className="h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
-                />
-                <input
-                  value={e.next_note}
-                  onChange={(ev) => setEntries(entries.map((x, i) => i === idx ? { ...x, next_note: ev.target.value } : x))}
-                  placeholder="ทำต่อ"
-                  className="mt-1.5 h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
-                />
-              </div>
-              <button
-                onClick={() => setEntries(entries.filter((_, i) => i !== idx))}
-                className="col-span-1 h-9 flex items-center justify-center text-ink-700 hover:text-rose"
-                title="Delete"
+              <div
+                key={idx}
+                onFocusCapture={() => { focusIdxRef.current = idx; }}
+                className="bg-cream-50 border-1.5 border-ink-900 rounded-card p-3 shadow-stamp-sm"
               >
-                <Trash2 size={16} />
-              </button>
-            </div>
+                {/* Mobile layout */}
+                <div className="md:hidden flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <ProjectPicker
+                        value={e.project_id}
+                        onChange={(v) => update({ project_id: v })}
+                        projects={projects}
+                        error={!!err.project_id}
+                      />
+                      {err.project_id && <span className="text-rose text-[10px] font-mono">{err.project_id}</span>}
+                    </div>
+                    <button
+                      onClick={() => setEntries(entries.filter((_, i) => i !== idx))}
+                      className="h-9 w-9 shrink-0 flex items-center justify-center border-1.5 border-ink-900 rounded-field bg-paper text-ink-700 hover:text-rose"
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <TimePicker
+                        value={e.start_time}
+                        onChange={(v) => update({ start_time: v })}
+                        error={!!err.start_time}
+                      />
+                      {err.start_time && <span className="text-rose text-[10px] font-mono">{err.start_time}</span>}
+                    </div>
+                    <span className="font-mono text-ink-500 text-sm pt-2">→</span>
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <TimePicker
+                        value={e.end_time}
+                        onChange={(v) => update({ end_time: v })}
+                        error={!!err.end_time}
+                      />
+                      {err.end_time && <span className="text-rose text-[10px] font-mono">{err.end_time}</span>}
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <ProgressPicker
+                        value={e.progress}
+                        onChange={(v) => update({ progress: v })}
+                        error={!!err.progress}
+                      />
+                      {err.progress && <span className="text-rose text-[10px] font-mono">{err.progress}</span>}
+                    </div>
+                  </div>
+                  <input
+                    value={e.done_note}
+                    onChange={(ev) => update({ done_note: ev.target.value })}
+                    placeholder="ทำเสร็จ"
+                    className="h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                  />
+                  <input
+                    value={e.next_note}
+                    onChange={(ev) => update({ next_note: ev.target.value })}
+                    placeholder="ทำต่อ"
+                    className="h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                  />
+                </div>
+
+                {/* Desktop layout */}
+                <div className="hidden md:grid grid-cols-12 gap-2 items-start">
+                  <div className="col-span-2 flex flex-col gap-0.5">
+                    <TimePicker
+                      value={e.start_time}
+                      onChange={(v) => update({ start_time: v })}
+                      error={!!err.start_time}
+                    />
+                    {err.start_time && <span className="text-rose text-[10px] font-mono">{err.start_time}</span>}
+                  </div>
+                  <div className="col-span-2 flex flex-col gap-0.5">
+                    <TimePicker
+                      value={e.end_time}
+                      onChange={(v) => update({ end_time: v })}
+                      error={!!err.end_time}
+                    />
+                    {err.end_time && <span className="text-rose text-[10px] font-mono">{err.end_time}</span>}
+                  </div>
+                  <div className="col-span-3 flex flex-col gap-0.5">
+                    <ProjectPicker
+                      value={e.project_id}
+                      onChange={(v) => update({ project_id: v })}
+                      projects={projects}
+                      error={!!err.project_id}
+                    />
+                    {err.project_id && <span className="text-rose text-[10px] font-mono">{err.project_id}</span>}
+                  </div>
+                  <div className="col-span-2 flex flex-col gap-0.5">
+                    <ProgressPicker
+                      value={e.progress}
+                      onChange={(v) => update({ progress: v })}
+                      error={!!err.progress}
+                    />
+                    {err.progress && <span className="text-rose text-[10px] font-mono">{err.progress}</span>}
+                  </div>
+                  <div className="col-span-2">
+                    <input
+                      value={e.done_note}
+                      onChange={(ev) => update({ done_note: ev.target.value })}
+                      placeholder="ทำเสร็จ"
+                      className="h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                    />
+                    <input
+                      value={e.next_note}
+                      onChange={(ev) => update({ next_note: ev.target.value })}
+                      placeholder="ทำต่อ"
+                      className="mt-1.5 h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setEntries(entries.filter((_, i) => i !== idx))}
+                    className="col-span-1 h-9 flex items-center justify-center text-ink-700 hover:text-rose"
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -372,8 +438,8 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
         </div>
       </div>
 
-      <div className="md:hidden h-20" />
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-paper border-t-1.5 border-ink-900 p-3 flex items-center justify-between gap-2 shadow-[0_-3px_0_0_rgba(15,27,45,0.08)]">
+      <div className="md:hidden h-36" />
+      <div className="md:hidden fixed bottom-16 left-0 right-0 z-40 bg-paper border-t-1.5 border-ink-900 p-3 flex items-center justify-between gap-2 shadow-[0_-3px_0_0_rgba(15,27,45,0.08)]">
         {otPreview ? (
           <div className="flex flex-col font-mono text-xs leading-tight">
             <span className="text-ink-500">OT preview</span>
