@@ -8,13 +8,14 @@ import { useProjects } from '@/hooks/useProjects';
 import { calculateOT } from '@/lib/ot';
 import { formatMoney, formatHours } from '@/lib/format';
 import { formatThaiDate, formatTime } from '@/lib/date';
-import { useCopyTable } from './useCopyTable';
+import { useCopyTable, useCopyText } from './useCopyTable';
 
 export function OTTable({ from, to }: { from: string; to: string }) {
   const { data: days = [] } = useDaysInRange(from, to);
   const { data: settings } = useSettings();
   const { data: projects = [] } = useProjects();
   const copy = useCopyTable();
+  const copyText = useCopyText();
 
   const projectName = (id: string) => projects.find((p) => p.id === id)?.code ?? '—';
 
@@ -100,7 +101,18 @@ export function OTTable({ from, to }: { from: string; to: string }) {
               {r.span} · 1.5x {formatHours(r.ot.hours15x)} · 3x {formatHours(r.ot.hours3x)}
             </div>
             {r.done && (
-              <div className="font-body text-xs text-ink-700 line-clamp-2">{r.done}</div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-body text-xs text-ink-700 line-clamp-2 flex-1">{r.done}</div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 shrink-0"
+                  onClick={() => copyText(r.done)}
+                  aria-label="คัดลอกสิ่งที่ทำ"
+                >
+                  <Copy size={12} />
+                </Button>
+              </div>
             )}
           </div>
         ))}
@@ -145,7 +157,21 @@ export function OTTable({ from, to }: { from: string; to: string }) {
                 <td className="px-4 py-2 text-right">{formatHours(r.ot.hours15x)}</td>
                 <td className="px-4 py-2 text-right">{formatHours(r.ot.hours3x)}</td>
                 <td className="px-4 py-2 text-right font-display font-bold text-tangerine">฿{formatMoney(r.ot.total)}</td>
-                <td className="px-4 py-2 font-body text-xs text-ink-700 max-w-md truncate">{r.done || '—'}</td>
+                <td className="px-4 py-2 font-body text-xs text-ink-700 max-w-md">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate">{r.done || '—'}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 shrink-0"
+                      disabled={!r.done}
+                      onClick={() => copyText(r.done)}
+                      aria-label="คัดลอกสิ่งที่ทำ"
+                    >
+                      <Copy size={12} />
+                    </Button>
+                  </div>
+                </td>
               </tr>
             ))}
             {rows.length > 0 && (

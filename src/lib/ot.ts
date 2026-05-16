@@ -38,6 +38,8 @@ export interface OTResult {
 const WEEKDAY_DINNER_START = 16 * 60 + 40; // 16:40
 const WEEKDAY_DINNER_END = 17 * 60;        // 17:00
 const WEEKDAY_OT_START = 17 * 60;          // 17:00
+const WEEKDAY_BONUS_END = 19 * 60;         // 19:00 — ทำเต็ม 17-19 → +30 min bonus
+const WEEKDAY_BONUS_MIN = 30;
 const HOLIDAY_DAY_END = 17 * 60;           // 17:00 — boundary 1.5x/3x
 
 const FIVE_HOURS = 5 * 60;
@@ -129,6 +131,16 @@ export function calculateOT(
       min15 -= take;
       deduct -= take;
       if (deduct > 0) min3 -= Math.min(min3, deduct);
+    }
+
+    // weekday bonus: ทำต่อเนื่องครอบช่วง 17:00-19:00 → +30 นาที @1.5x
+    // (ไม่หักจาก 5h rule เพราะเป็นเงินที่บริษัทจ่ายเพิ่ม)
+    if (
+      !day.is_holiday &&
+      block.start <= WEEKDAY_OT_START &&
+      block.end >= WEEKDAY_BONUS_END
+    ) {
+      min15 += WEEKDAY_BONUS_MIN;
     }
 
     totalMin15 += min15;

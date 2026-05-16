@@ -10,6 +10,19 @@ export interface OTRow {
   note: string;
 }
 
+/** copy plain text → ใช้กับปุ่ม copy รายแถว */
+export function useCopyText() {
+  return useCallback(async (text: string) => {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      notify.success('คัดลอกแล้ว');
+    } catch {
+      notify.error('clipboard ไม่ทำงาน — ลองอีกครั้ง');
+    }
+  }, []);
+}
+
 /** copy เป็น TSV → paste ลง Excel/Google Sheets ได้ตรงๆ */
 export function useCopyTable() {
   return useCallback(async (rows: OTRow[]) => {
