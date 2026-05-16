@@ -43,21 +43,8 @@ export const THAI_HOLIDAYS: Record<string, string> = {
   '2026-12-31': 'วันสิ้นปี',
 };
 
-export function getHolidayName(dateISO: string): string | undefined {
-  return THAI_HOLIDAYS[dateISO];
-}
-
-export function isThaiHoliday(dateISO: string): boolean {
-  return dateISO in THAI_HOLIDAYS;
-}
-
 export function isWeekend(dateISO: string): boolean {
   const d = new Date(dateISO + 'T00:00:00');
   const day = d.getDay();
   return day === 0 || day === 6;
-}
-
-/** ส-อา หรือ public holiday */
-export function isAutoHoliday(dateISO: string): boolean {
-  return isWeekend(dateISO) || isThaiHoliday(dateISO);
 }

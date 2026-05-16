@@ -1,6 +1,5 @@
 import { supabase } from './supabase';
 import type { Day, DayWithEntries, Entry, LocationKind } from '@/types/db';
-import { isAutoHoliday } from '@/lib/thai-holidays';
 
 export async function getDay(dateISO: string): Promise<DayWithEntries | null> {
   const { data, error } = await supabase
@@ -26,12 +25,11 @@ export async function listDaysInRange(from: string, to: string): Promise<DayWith
 export async function upsertDay(patch: {
   date: string;
   location: LocationKind;
-  is_holiday?: boolean;
+  is_holiday: boolean;
   note?: string | null;
 }): Promise<Day> {
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) throw new Error('not authenticated');
-  const is_holiday = patch.is_holiday ?? isAutoHoliday(patch.date);
   const { data, error } = await supabase
     .from('days')
     .upsert(
@@ -39,7 +37,7 @@ export async function upsertDay(patch: {
         user_id: user.id,
         date: patch.date,
         location: patch.location,
-        is_holiday,
+        is_holiday: patch.is_holiday,
         note: patch.note ?? null,
         updated_at: new Date().toISOString(),
       },

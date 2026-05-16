@@ -16,6 +16,7 @@ const MonthlyDashboardPage = lazy(() => import('@/pages/MonthlyDashboardPage').t
 const QuarterlyDashboardPage = lazy(() => import('@/pages/QuarterlyDashboardPage').then((m) => ({ default: m.QuarterlyDashboardPage })));
 const OTDashboardPage = lazy(() => import('@/pages/OTDashboardPage').then((m) => ({ default: m.OTDashboardPage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
+const CalendarMaintenancePage = lazy(() => import('@/pages/CalendarMaintenancePage').then((m) => ({ default: m.CalendarMaintenancePage })));
 
 const qc = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="dashboard/quarterly" element={<QuarterlyDashboardPage />} />
               <Route path="dashboard/ot" element={<OTDashboardPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="settings/calendar" element={<CalendarMaintenancePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Route>

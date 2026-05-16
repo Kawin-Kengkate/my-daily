@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, CalendarRange, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { notify } from '@/lib/notify';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { Skeleton } from '@/components/Skeleton';
 import { useSettings, useSaveSettings } from '@/hooks/useSettings';
 
 export function SettingsPage() {
+  const navigate = useNavigate();
   const { data: settings, isLoading } = useSettings();
   const save = useSaveSettings();
   const [show, setShow] = useState(false);
@@ -91,6 +93,20 @@ export function SettingsPage() {
             </div>
           </div>
         </div>
+      </Card>
+
+      <Card
+        className="p-5 flex items-center gap-3 cursor-pointer hover:bg-cream-50 transition-colors"
+        onClick={() => navigate('/settings/calendar')}
+      >
+        <CalendarRange size={22} className="text-peri shrink-0" />
+        <div className="flex-1">
+          <h3 className="font-display font-bold text-h4 leading-tight">ปฏิทินวันทำงาน</h3>
+          <p className="font-body text-sm text-ink-500 mt-0.5">
+            จัดการเสาร์ที่ต้องทำงาน + วันหยุดพิเศษของบริษัท
+          </p>
+        </div>
+        <ChevronRight size={18} className="text-ink-500" />
       </Card>
 
       <Card className="p-5 space-y-4">

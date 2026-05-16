@@ -4,7 +4,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { fromISO, toISO, addMonths, getMonthGrid, isSameMonth, isSameDay, formatThaiDate } from '@/lib/date';
-import { isAutoHoliday } from '@/lib/thai-holidays';
+import { resolveIsHoliday } from '@/lib/calendar';
+import { useCalendarOverrides } from '@/hooks/useCalendarOverrides';
 
 interface Props {
   value: string;
@@ -18,6 +19,7 @@ const DOW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 export function DatePopover({ value, onChange, className, buttonClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [viewMonth, setViewMonth] = useState(() => format(fromISO(value), 'yyyy-MM'));
+  const { map: overrides } = useCalendarOverrides();
   const grid = getMonthGrid(viewMonth);
   const monthDate = fromISO(`${viewMonth}-01`);
   const selected = fromISO(value);
@@ -73,7 +75,7 @@ export function DatePopover({ value, onChange, className, buttonClassName }: Pro
               const isSel = isSameDay(d, selected);
               const isToday = isSameDay(d, today);
               const iso = toISO(d);
-              const isHol = isAutoHoliday(iso);
+              const isHol = resolveIsHoliday(iso, overrides);
               return (
                 <button
                   key={iso}

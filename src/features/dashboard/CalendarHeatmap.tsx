@@ -3,7 +3,8 @@ import * as HoverCard from '@radix-ui/react-hover-card';
 import { useNavigate } from 'react-router-dom';
 import type { DayWithEntries, Project } from '@/types/db';
 import { getMonthGrid, isSameMonth, toISO, formatThaiDate, diffHours } from '@/lib/date';
-import { isAutoHoliday, getHolidayName } from '@/lib/thai-holidays';
+import { resolveDay } from '@/lib/calendar';
+import { useCalendarOverrides } from '@/hooks/useCalendarOverrides';
 import { parseHHMM } from '@/lib/ot';
 import { Star4 } from '@/components/Star4';
 import { Pill } from '@/components/Pill';
@@ -35,6 +36,7 @@ interface Props {
 
 export function CalendarHeatmap({ yyyymm, days, projects = [] }: Props) {
   const navigate = useNavigate();
+  const { map: overrides } = useCalendarOverrides();
   const grid = useMemo(() => getMonthGrid(yyyymm), [yyyymm]);
   const monthDate = new Date(`${yyyymm}-01T00:00:00`);
   const byDate = useMemo(() => {
@@ -62,7 +64,9 @@ export function CalendarHeatmap({ yyyymm, days, projects = [] }: Props) {
           const iso = toISO(d);
           const isCur = isSameMonth(d, monthDate);
           const day = byDate.get(iso);
-          const holiday = isAutoHoliday(iso);
+          const info = resolveDay(iso, overrides);
+          const holiday = info.type === 'holiday';
+          const isWorkingOverride = info.source === 'override_working';
           const hasOT = !!day?.entries?.some((e) => parseHHMM(e.end_time) > 17 * 60);
 
           const cellInner = (
@@ -70,6 +74,7 @@ export function CalendarHeatmap({ yyyymm, days, projects = [] }: Props) {
               <span className="font-mono text-tiny font-bold">{d.getDate()}</span>
               {hasOT && <Star4 size={12} className="absolute bottom-1 right-1" />}
               {holiday && <span className="absolute bottom-0.5 right-0.5 text-[10px]">🎉</span>}
+              {isWorkingOverride && <span className="absolute bottom-0.5 right-0.5 text-[10px]">📌</span>}
             </>
           );
 
@@ -79,6 +84,7 @@ export function CalendarHeatmap({ yyyymm, days, projects = [] }: Props) {
             day ? locationBg[day.location] : 'bg-paper',
             !isCur && 'opacity-30',
             holiday && !day && 'bg-lemon-soft',
+            isWorkingOverride && !day && 'bg-peri-soft',
           );
 
           return (
@@ -99,7 +105,7 @@ export function CalendarHeatmap({ yyyymm, days, projects = [] }: Props) {
                   sideOffset={6}
                   className="z-50 w-[240px] pointer-events-none bg-paper border-1.5 border-ink-900 rounded-card shadow-stamp-lg p-3 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
                 >
-                  <DayPopup iso={iso} day={day} holiday={holiday} projectById={projectById} />
+                  <DayPopup iso={iso} day={day} holidayLabel={info.label ?? null} holiday={holiday} projectById={projectById} />
                   <HoverCard.Arrow className="fill-ink-900" />
                 </HoverCard.Content>
               </HoverCard.Portal>
@@ -115,14 +121,16 @@ function DayPopup({
   iso,
   day,
   holiday,
+  holidayLabel,
   projectById,
 }: {
   iso: string;
   day?: DayWithEntries;
   holiday: boolean;
+  holidayLabel: string | null;
   projectById: Map<string, Project>;
 }) {
-  const holidayName = holiday ? getHolidayName(iso) : null;
+  const holidayName = holiday ? holidayLabel : null;
   const totalHours = day?.entries.reduce((s, e) => s + diffHours(e.start_time, e.end_time), 0) ?? 0;
   const latestEnd = day?.entries.reduce<string | null>(
     (acc, e) => (!acc || e.end_time > acc ? e.end_time : acc),

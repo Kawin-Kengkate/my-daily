@@ -1,5 +1,6 @@
 export type LocationKind = 'wfh' | 'onsite' | 'leave' | 'training' | 'holiday';
 export type ProjectStatus = 'active' | 'on_hold' | 'done' | 'archived';
+export type CalendarOverrideKind = 'working' | 'holiday';
 
 export interface Profile {
   id: string;
@@ -66,4 +67,13 @@ export interface Entry {
 
 export interface DayWithEntries extends Day {
   entries: Entry[];
+}
+
+export interface CalendarOverride {
+  id: string;
+  user_id: string;
+  date: string;            // 'YYYY-MM-DD'
+  kind: CalendarOverrideKind;
+  label: string | null;
+  created_at: string;
 }

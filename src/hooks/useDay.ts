@@ -22,7 +22,7 @@ export function useSaveDay() {
     mutationFn: async (input: {
       date: string;
       location: LocationKind;
-      is_holiday?: boolean;
+      is_holiday: boolean;
       note?: string | null;
       entries: Array<{
         project_id: string;

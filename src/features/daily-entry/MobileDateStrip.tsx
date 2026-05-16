@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
 import { addDays, fromISO, toISO, formatThaiDate } from '@/lib/date';
-import { isAutoHoliday } from '@/lib/thai-holidays';
+import { resolveIsHoliday } from '@/lib/calendar';
+import { useCalendarOverrides } from '@/hooks/useCalendarOverrides';
 import { cn } from '@/lib/utils';
 
 export function MobileDateStrip({ dateISO, onPick }: { dateISO: string; onPick: (iso: string) => void }) {
+  const { map: overrides } = useCalendarOverrides();
   const days = useMemo(() => {
     const center = fromISO(dateISO);
     return Array.from({ length: 7 }, (_, i) => addDays(center, i - 3));
@@ -16,7 +18,7 @@ export function MobileDateStrip({ dateISO, onPick }: { dateISO: string; onPick: 
         const iso = toISO(d);
         const isSel = iso === dateISO;
         const isToday = iso === todayISO;
-        const isHol = isAutoHoliday(iso);
+        const isHol = resolveIsHoliday(iso, overrides);
         return (
           <button
             key={iso}

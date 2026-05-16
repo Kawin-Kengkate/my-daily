@@ -15,10 +15,13 @@ import { Sticker } from '@/components/Sticker';
 import { TimePicker } from '@/components/TimePicker';
 import { RecentProjects } from './RecentProjects';
 import { QuickPresets, type PresetBlock } from './QuickPresets';
+import { HolidayPrefillBanner } from './HolidayPrefillBanner';
+import { MissingDaysBanner } from './MissingDaysBanner';
 import { useDay, useSaveDay } from '@/hooks/useDay';
 import { useProjects } from '@/hooks/useProjects';
 import { useSettings } from '@/hooks/useSettings';
-import { isAutoHoliday, getHolidayName } from '@/lib/thai-holidays';
+import { useCalendarOverrides } from '@/hooks/useCalendarOverrides';
+import { resolveDay } from '@/lib/calendar';
 import { calculateOT } from '@/lib/ot';
 import { formatMoney, formatHours, friendlyDbError } from '@/lib/format';
 import { formatThaiDate, addDays, toISO, fromISO } from '@/lib/date';
@@ -51,10 +54,13 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
   const { data: day, isLoading } = useDay(dateISO);
   const { data: projects = [] } = useProjects();
   const { data: settings } = useSettings();
+  const { map: overrides } = useCalendarOverrides();
   const saveDay = useSaveDay();
 
+  const dayInfo = useMemo(() => resolveDay(dateISO, overrides), [dateISO, overrides]);
+
   const [location, setLocation] = useState<LocationKind>('onsite');
-  const [isHoliday, setIsHoliday] = useState<boolean>(isAutoHoliday(dateISO));
+  const [isHoliday, setIsHoliday] = useState<boolean>(dayInfo.type === 'holiday');
   const [note, setNote] = useState('');
   const [entries, setEntries] = useState<EntryDraft[]>([blankEntry()]);
   const focusIdxRef = useRef<number | null>(null);
@@ -78,12 +84,13 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       );
       if (!day.entries || day.entries.length === 0) setEntries([blankEntry()]);
     } else {
-      setLocation('onsite');
-      setIsHoliday(isAutoHoliday(dateISO));
+      setLocation(dayInfo.type === 'holiday' ? 'holiday' : 'onsite');
+      setIsHoliday(dayInfo.type === 'holiday');
       setNote('');
       setEntries([blankEntry()]);
     }
-  }, [day, isLoading, dateISO]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [day, isLoading, dateISO, dayInfo.type]);
 
   const errors = useMemo(() => entryErrors(entries), [entries]);
   const hasErrors = errors.some((e) => Object.keys(e).length > 0);
@@ -98,7 +105,18 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
     );
   }, [entries, isHoliday, location, settings]);
 
-  const holidayName = getHolidayName(dateISO);
+  const totalHours = useMemo(() => {
+    return entries.reduce((sum, e) => {
+      if (!e.start_time || !e.end_time) return sum;
+      const [sh, sm] = e.start_time.split(':').map(Number);
+      const [eh, em] = e.end_time.split(':').map(Number);
+      const diff = (eh * 60 + (em || 0) - sh * 60 - (sm || 0)) / 60;
+      return sum + Math.max(0, diff);
+    }, 0);
+  }, [entries]);
+  const tooLong = totalHours > 14;
+
+  const holidayName = dayInfo.label;
   const isSaved = !!day?.id;
   const savedAgo = day?.updated_at
     ? formatDistanceToNow(new Date(day.updated_at), { addSuffix: true, locale: th })
@@ -190,8 +208,15 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
             <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
           </span>
         </div>
-        {holidayName && <Sticker color="lemon" rotate={-3}>🎉 {holidayName}</Sticker>}
-        {!holidayName && isHoliday && <Sticker color="lemon" rotate={-3}>วันหยุด</Sticker>}
+        {dayInfo.source === 'override_working' && (
+          <Sticker color="peri" rotate={-3}>📌 {dayInfo.label}</Sticker>
+        )}
+        {dayInfo.type === 'holiday' && holidayName && (
+          <Sticker color="lemon" rotate={-3}>🎉 {holidayName}</Sticker>
+        )}
+        {dayInfo.type === 'holiday' && !holidayName && (
+          <Sticker color="lemon" rotate={-3}>วันหยุด</Sticker>
+        )}
       </div>
 
       <div className="md:hidden space-y-2">
@@ -203,10 +228,25 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
         </div>
         <MobileDateStrip dateISO={dateISO} onPick={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
-        {(holidayName || isHoliday) && (
+        {dayInfo.source === 'override_working' && (
+          <Sticker color="peri" rotate={-3}>📌 {dayInfo.label}</Sticker>
+        )}
+        {dayInfo.type === 'holiday' && (
           <Sticker color="lemon" rotate={-3}>{holidayName ? `🎉 ${holidayName}` : 'วันหยุด'}</Sticker>
         )}
       </div>
+
+      <MissingDaysBanner dateISO={dateISO} />
+      {dayInfo.type === 'holiday' && <HolidayPrefillBanner dateISO={dateISO} daySaved={isSaved} />}
+
+      {tooLong && !skipEntries && (
+        <Card className="p-3 bg-rose-soft border-ink-900 flex items-center gap-2">
+          <span className="text-lg">⚠️</span>
+          <span className="font-mono text-sm">
+            รวม <b>{totalHours.toFixed(1)} ชม.</b> ในวันเดียว — ใส่ผิดมั้ย? (เกิน 14 ชม.)
+          </span>
+        </Card>
+      )}
 
       <Card>
         <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
