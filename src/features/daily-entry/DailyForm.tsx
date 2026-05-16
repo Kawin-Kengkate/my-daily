@@ -12,11 +12,13 @@ import { ProgressPicker } from './ProgressPicker';
 import { ProjectPicker } from './ProjectPicker';
 import { Card } from '@/components/ui/card';
 import { Sticker } from '@/components/Sticker';
+import { StreakBadge } from '@/components/StreakBadge';
 import { TimePicker } from '@/components/TimePicker';
 import { RecentProjects } from './RecentProjects';
 import { QuickPresets, type PresetBlock } from './QuickPresets';
 import { HolidayPrefillBanner } from './HolidayPrefillBanner';
 import { MissingDaysBanner } from './MissingDaysBanner';
+import { loadDraft, clearDraft, useAutoSaveDraft } from '@/hooks/useLocalDraft';
 import { useDay, useSaveDay } from '@/hooks/useDay';
 import { useProjects, useLatestProgressByProject } from '@/hooks/useProjects';
 import { useSettings } from '@/hooks/useSettings';
@@ -85,13 +87,29 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       );
       if (!day.entries || day.entries.length === 0) setEntries([blankEntry()]);
     } else {
-      setLocation(dayInfo.type === 'holiday' ? 'holiday' : 'onsite');
-      setIsHoliday(dayInfo.type === 'holiday');
-      setNote('');
-      setEntries([blankEntry()]);
+      const draft = loadDraft(dateISO);
+      if (draft) {
+        setLocation(draft.location);
+        setIsHoliday(draft.is_holiday);
+        setNote(draft.note);
+        setEntries(draft.entries.length > 0 ? draft.entries : [blankEntry()]);
+      } else {
+        setLocation(dayInfo.type === 'holiday' ? 'holiday' : 'onsite');
+        setIsHoliday(dayInfo.type === 'holiday');
+        setNote('');
+        setEntries([blankEntry()]);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [day, isLoading, dateISO, dayInfo.type]);
+
+  // auto-save draft เฉพาะกรณียังไม่มี Day row ใน DB (วันใหม่)
+  const draftEnabled = !isLoading && !day;
+  const draftSavedAt = useAutoSaveDraft(
+    dateISO,
+    { location, is_holiday: isHoliday, note, entries },
+    draftEnabled,
+  );
 
   const errors = useMemo(() => entryErrors(entries), [entries]);
   const hasErrors = errors.some((e) => Object.keys(e).length > 0);
@@ -143,6 +161,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           note: note || null,
           entries: [],
         });
+        clearDraft(dateISO);
         notify.success('บันทึกแล้ว ✓');
       } catch (err) {
         notify.error(friendlyDbError(err, 'บันทึกไม่สำเร็จ'));
@@ -172,6 +191,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           next_note: e.next_note.trim() || null,
         })),
       });
+      clearDraft(dateISO);
       notify.success('บันทึกแล้ว ✓');
     } catch (err) {
       notify.error('save error: ' + (err as Error).message);
@@ -221,8 +241,12 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
             </Button>
           )}
           <span className="font-display font-bold text-h4 ml-2 leading-none">{formatThaiDate(dateISO, 'EEEE d MMMM yyyy')}</span>
-          <span className="ml-3 inline-flex items-center">
+          <span className="ml-3 inline-flex items-center gap-2">
             <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
+            <StreakBadge />
+            {draftEnabled && draftSavedAt && (
+              <span className="font-mono text-[10px] text-ink-500">· draft saved</span>
+            )}
           </span>
         </div>
         {dayInfo.source === 'override_working' && (
@@ -248,8 +272,9 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
             <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center gap-2 flex-wrap">
           <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
+          <StreakBadge />
         </div>
         <MobileDateStrip dateISO={dateISO} onPick={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
         {dayInfo.source === 'override_working' && (

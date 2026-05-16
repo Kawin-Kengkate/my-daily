@@ -15,6 +15,7 @@ const ProjectsPage = lazy(() => import('@/pages/ProjectsPage').then((m) => ({ de
 const MonthlyDashboardPage = lazy(() => import('@/pages/MonthlyDashboardPage').then((m) => ({ default: m.MonthlyDashboardPage })));
 const QuarterlyDashboardPage = lazy(() => import('@/pages/QuarterlyDashboardPage').then((m) => ({ default: m.QuarterlyDashboardPage })));
 const OTDashboardPage = lazy(() => import('@/pages/OTDashboardPage').then((m) => ({ default: m.OTDashboardPage })));
+const ComparePage = lazy(() => import('@/pages/ComparePage').then((m) => ({ default: m.ComparePage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const CalendarMaintenancePage = lazy(() => import('@/pages/CalendarMaintenancePage').then((m) => ({ default: m.CalendarMaintenancePage })));
 
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="dashboard/monthly" element={<MonthlyDashboardPage />} />
               <Route path="dashboard/quarterly" element={<QuarterlyDashboardPage />} />
               <Route path="dashboard/ot" element={<OTDashboardPage />} />
+              <Route path="dashboard/compare" element={<ComparePage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="settings/calendar" element={<CalendarMaintenancePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />

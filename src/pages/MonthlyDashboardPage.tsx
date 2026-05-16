@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { GitCompare } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { CalendarHeatmap } from '@/features/dashboard/CalendarHeatmap';
 import { StatBlock } from '@/features/dashboard/StatBlock';
 import { ProjectDonut } from '@/features/dashboard/ProjectDonut';
@@ -12,8 +15,10 @@ import { monthRange } from '@/lib/date';
 import { calculateOT } from '@/lib/ot';
 import { formatMoney, formatHours } from '@/lib/format';
 import { MonthPicker } from '@/components/MonthPicker';
+import { StreakBadge } from '@/components/StreakBadge';
 
 export function MonthlyDashboardPage() {
+  const navigate = useNavigate();
   const [month, setMonth] = useState(() => format(new Date(), 'yyyy-MM'));
   const range = useMemo(() => monthRange(month), [month]);
   const { data: days = [], isLoading } = useDaysInRange(range.from, range.to);
@@ -37,9 +42,13 @@ export function MonthlyDashboardPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <h2 className="font-display font-extrabold text-display">Monthly</h2>
         <MonthPicker value={month} onChange={setMonth} />
+        <Button variant="paper" size="sm" onClick={() => navigate('/dashboard/compare')}>
+          <GitCompare size={14} /> Compare
+        </Button>
+        <StreakBadge size="md" className="ml-auto" />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">

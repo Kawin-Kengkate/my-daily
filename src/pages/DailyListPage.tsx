@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Layers } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Pill } from '@/components/Pill';
 import { useDaysInRange } from '@/hooks/useDay';
@@ -7,18 +8,24 @@ import { monthRange, formatThaiDate, todayISO } from '@/lib/date';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { MonthPicker } from '@/components/MonthPicker';
+import { BulkApplyModal } from '@/features/daily-entry/BulkApplyModal';
 
 export function DailyListPage() {
   const [month, setMonth] = useState(() => format(new Date(), 'yyyy-MM'));
+  const [bulkOpen, setBulkOpen] = useState(false);
   const range = useMemo(() => monthRange(month), [month]);
   const { data: days = [], isLoading } = useDaysInRange(range.from, range.to);
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <h2 className="font-display font-extrabold text-display">Daily log</h2>
         <MonthPicker value={month} onChange={setMonth} />
+        <Button variant="paper" size="sm" onClick={() => setBulkOpen(true)} className="ml-auto">
+          <Layers size={14} /> Bulk apply
+        </Button>
       </div>
+      <BulkApplyModal open={bulkOpen} onOpenChange={setBulkOpen} defaultMonth={month} />
       <Card>
         <div className="p-2">
           {isLoading && (
