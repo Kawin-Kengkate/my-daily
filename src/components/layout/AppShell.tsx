@@ -112,7 +112,7 @@ export function AppShell() {
           </div>
         </div>
       </header>
-      <main className="max-w-6xl mx-auto px-5 md:px-8 py-6 pb-24 md:pb-6">
+      <main className="max-w-6xl mx-auto px-5 md:px-8 py-6 pb-14 md:pb-6">
         <Outlet />
       </main>
       <nav

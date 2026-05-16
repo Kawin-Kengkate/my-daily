@@ -33,7 +33,14 @@ export function ProgressPicker({ value, onChange, error, className }: ProgressPi
             className,
           )}
         >
-          <span className={value === 'complete' ? 'text-mint' : 'text-ink-900'}>{value}</span>
+          <span
+            className={cn(
+              'truncate min-w-0',
+              value === 'complete' ? 'text-mint text-xs' : 'text-ink-900',
+            )}
+          >
+            {value === 'complete' ? 'done ✓' : value}
+          </span>
           <ChevronDown size={14} className="text-ink-500 shrink-0" />
         </button>
       </Popover.Trigger>
