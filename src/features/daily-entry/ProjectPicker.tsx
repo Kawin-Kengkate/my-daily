@@ -78,10 +78,15 @@ export function ProjectPicker({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
+          side="bottom"
           align="start"
           sideOffset={6}
-          collisionPadding={8}
-          className="z-50 bg-paper border-1.5 border-ink-900 rounded-card shadow-stamp-lg p-2 w-[280px]"
+          avoidCollisions={false}
+          className="z-50 bg-paper border-1.5 border-ink-900 rounded-card shadow-stamp-lg p-2 w-[280px] flex flex-col"
+          style={{
+            // จำกัด max-height ตามพื้นที่ที่เหลือใน viewport (ไม่ flip ขึ้นบน)
+            maxHeight: 'min(320px, var(--radix-popover-content-available-height, 320px))',
+          }}
         >
           <input
             ref={inputRef}
@@ -90,13 +95,13 @@ export function ProjectPicker({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="ค้นหา code หรือชื่อ…"
             className={cn(
-              'w-full h-8 px-2 mb-2 bg-cream-50 border-1.5 border-ink-900 rounded-field',
+              'w-full h-8 px-2 mb-2 bg-cream-50 border-1.5 border-ink-900 rounded-field shrink-0',
               'font-mono text-xs outline-none placeholder:text-ink-300',
               'focus-visible:ring-2 focus-visible:ring-tangerine focus-visible:ring-offset-1',
             )}
           />
 
-          <div className="max-h-52 overflow-y-auto flex flex-col gap-0.5">
+          <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-0.5">
             {!query && (
               <button
                 type="button"

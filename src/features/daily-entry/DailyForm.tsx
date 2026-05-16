@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { notify } from '@/lib/notify';
 import { formatDistanceToNow } from 'date-fns';
 import { th } from 'date-fns/locale';
-import { Trash2, Plus, Copy, CheckCircle2, CalendarCheck } from 'lucide-react';
+import { Trash2, Plus, Copy, CheckCircle2, CalendarCheck, Layers, List } from 'lucide-react';
 import { DatePopover } from '@/components/DatePopover';
 import { MobileDateStrip } from './MobileDateStrip';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { RecentProjects } from './RecentProjects';
 import { QuickPresets, type PresetBlock } from './QuickPresets';
 import { HolidayPrefillBanner } from './HolidayPrefillBanner';
 import { MissingDaysBanner } from './MissingDaysBanner';
+import { BulkApplyModal } from './BulkApplyModal';
 import { loadDraft, clearDraft, useAutoSaveDraft } from '@/hooks/useLocalDraft';
 import { useDay, useSaveDay } from '@/hooks/useDay';
 import { useProjects, useLatestProgressByProject } from '@/hooks/useProjects';
@@ -227,6 +228,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
   };
   const goToday = () => { window.location.hash = `#/daily/${todayISO()}`; };
   const isToday = dateISO === todayISO();
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   return (
     <div ref={formRef} className="space-y-4">
@@ -240,6 +242,14 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
               <CalendarCheck size={14} /> Today
             </Button>
           )}
+          <Button variant="paper" size="sm" onClick={() => setBulkOpen(true)} title="Bulk apply">
+            <Layers size={14} /> <span className="hidden lg:inline">Bulk</span>
+          </Button>
+          <a href="#/daily" className="inline-flex" title="ดูรายการทั้งเดือน">
+            <Button variant="paper" size="sm">
+              <List size={14} /> <span className="hidden lg:inline">All days</span>
+            </Button>
+          </a>
           <span className="font-display font-bold text-h4 ml-2 leading-none">{formatThaiDate(dateISO, 'EEEE d MMMM yyyy')}</span>
           <span className="ml-3 inline-flex items-center gap-2">
             <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
@@ -261,14 +271,22 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       </div>
 
       <div className="md:hidden space-y-2">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <span className="font-display font-bold text-h4 leading-none">{formatThaiDate(dateISO, 'EEE d MMM yy')}</span>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             {!isToday && (
               <Button variant="lemon" size="sm" onClick={goToday}>
                 <CalendarCheck size={14} /> Today
               </Button>
             )}
+            <Button variant="paper" size="sm" onClick={() => setBulkOpen(true)} title="Bulk apply">
+              <Layers size={14} />
+            </Button>
+            <a href="#/daily" className="inline-flex" title="ดูรายการทั้งเดือน">
+              <Button variant="paper" size="sm">
+                <List size={14} />
+              </Button>
+            </a>
             <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
           </div>
         </div>
@@ -287,6 +305,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
 
       <MissingDaysBanner dateISO={dateISO} />
       {dayInfo.type === 'holiday' && <HolidayPrefillBanner dateISO={dateISO} daySaved={isSaved} />}
+      <BulkApplyModal open={bulkOpen} onOpenChange={setBulkOpen} defaultMonth={dateISO.slice(0, 7)} />
 
       {tooLong && !skipEntries && (
         <Card className="p-3 bg-rose-soft border-ink-900 flex items-center gap-2">
