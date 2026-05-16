@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { notify } from '@/lib/notify';
 import { formatDistanceToNow } from 'date-fns';
 import { th } from 'date-fns/locale';
-import { Trash2, Plus, Copy, CheckCircle2, CalendarCheck, Layers, List } from 'lucide-react';
+import { Trash2, Plus, Copy, CheckCircle2, CalendarCheck, Layers } from 'lucide-react';
 import { DatePopover } from '@/components/DatePopover';
 import { MobileDateStrip } from './MobileDateStrip';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { ProjectPicker } from './ProjectPicker';
 import { Card } from '@/components/ui/card';
 import { Sticker } from '@/components/Sticker';
 import { StreakBadge } from '@/components/StreakBadge';
+import { Skeleton } from '@/components/Skeleton';
 import { TimePicker } from '@/components/TimePicker';
 import { RecentProjects } from './RecentProjects';
 import { QuickPresets, type PresetBlock } from './QuickPresets';
@@ -245,18 +246,10 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           <Button variant="paper" size="sm" onClick={() => setBulkOpen(true)} title="Bulk apply">
             <Layers size={14} /> <span className="hidden lg:inline">Bulk</span>
           </Button>
-          <a href="#/daily" className="inline-flex" title="ดูรายการทั้งเดือน">
-            <Button variant="paper" size="sm">
-              <List size={14} /> <span className="hidden lg:inline">All days</span>
-            </Button>
-          </a>
           <span className="font-display font-bold text-h4 ml-2 leading-none">{formatThaiDate(dateISO, 'EEEE d MMMM yyyy')}</span>
           <span className="ml-3 inline-flex items-center gap-2">
-            <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
+            {!isLoading && <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />}
             <StreakBadge />
-            {draftEnabled && draftSavedAt && (
-              <span className="font-mono text-[10px] text-ink-500">· draft saved</span>
-            )}
           </span>
         </div>
         {dayInfo.source === 'override_working' && (
@@ -282,16 +275,11 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
             <Button variant="paper" size="sm" onClick={() => setBulkOpen(true)} title="Bulk apply">
               <Layers size={14} />
             </Button>
-            <a href="#/daily" className="inline-flex" title="ดูรายการทั้งเดือน">
-              <Button variant="paper" size="sm">
-                <List size={14} />
-              </Button>
-            </a>
             <DatePopover value={dateISO} onChange={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />
+          {!isLoading && <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />}
           <StreakBadge />
         </div>
         <MobileDateStrip dateISO={dateISO} onPick={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
@@ -307,6 +295,10 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       {dayInfo.type === 'holiday' && <HolidayPrefillBanner dateISO={dateISO} daySaved={isSaved} />}
       <BulkApplyModal open={bulkOpen} onOpenChange={setBulkOpen} defaultMonth={dateISO.slice(0, 7)} />
 
+      {isLoading ? (
+        <Skeleton className="h-96" rounded="card" bordered />
+      ) : (
+        <>
       {tooLong && !skipEntries && (
         <Card className="p-3 bg-rose-soft border-ink-900 flex items-center gap-2">
           <span className="text-lg">⚠️</span>
@@ -545,6 +537,11 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
         ) : <span className="text-ink-500 font-mono text-sm">ตั้ง salary ที่ /settings เพื่อเห็น OT preview</span>}
         <div className="flex items-center gap-3">
           <span className="text-ink-300 font-mono text-xs hidden lg:inline">Ctrl+D คัดลอก row · Ctrl+Enter บันทึก</span>
+          {draftEnabled && draftSavedAt && (
+            <span className="font-mono text-[10px] text-ink-500" title="draft auto-saved to this browser">
+              draft saved
+            </span>
+          )}
           <Button
             variant={isHoliday ? 'tangerine' : 'primary'}
             size="lg"
@@ -563,7 +560,12 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       >
         {otPreview ? (
           <div className="flex flex-col font-mono text-xs leading-tight">
-            <span className="text-ink-500">OT preview</span>
+            <span className="text-ink-500">
+              OT preview
+              {draftEnabled && draftSavedAt && (
+                <span className="ml-1.5 text-ink-300">· draft saved</span>
+              )}
+            </span>
             <span className="text-tangerine font-display font-bold text-h4">฿{formatMoney(otPreview.total)}</span>
           </div>
         ) : <span className="text-ink-500 font-mono text-xs">ตั้ง salary ก่อน</span>}
@@ -576,6 +578,8 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           {saveDay.isPending ? '...' : 'Save ✓'}
         </Button>
       </div>
+        </>
+      )}
     </div>
   );
 }
