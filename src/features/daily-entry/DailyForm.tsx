@@ -27,7 +27,7 @@ import { useProjects, useLatestProgressByProject } from '@/hooks/useProjects';
 import { useSettings } from '@/hooks/useSettings';
 import { useCalendarOverrides } from '@/hooks/useCalendarOverrides';
 import { resolveDay } from '@/lib/calendar';
-import { calculateOT } from '@/lib/ot';
+import { calculateOT, calcWorkHours } from '@/lib/ot';
 import { formatMoney, formatHours, friendlyDbError } from '@/lib/format';
 import { formatThaiDate, addDays, toISO, fromISO, todayISO } from '@/lib/date';
 import { entryErrors } from '@/lib/schemas';
@@ -142,15 +142,17 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
     return currentProgress;
   };
 
+  const breakMinutes = settings?.break_minutes ?? 40;
+
   const totalHours = useMemo(() => {
-    return entries.reduce((sum, e) => {
-      if (!e.start_time || !e.end_time) return sum;
-      const [sh, sm] = e.start_time.split(':').map(Number);
-      const [eh, em] = e.end_time.split(':').map(Number);
-      const diff = (eh * 60 + (em || 0) - sh * 60 - (sm || 0)) / 60;
-      return sum + Math.max(0, diff);
-    }, 0);
-  }, [entries]);
+    return calcWorkHours(
+      entries.map((e) => ({ start_time: e.start_time, end_time: e.end_time })),
+      breakMinutes,
+      isHoliday,
+      location,
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entries, breakMinutes, isHoliday, location]);
   const tooLong = totalHours > 14;
 
   const holidayName = dayInfo.label;
@@ -158,7 +160,6 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
   const savedAgo = day?.updated_at
     ? formatDistanceToNow(new Date(day.updated_at), { addSuffix: true, locale: th })
     : null;
-  const entryCount = day?.entries?.length ?? 0;
 
   const handleSave = async () => {
     if (skipEntries) {
@@ -257,7 +258,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           </Button>
           <span className="font-display font-bold text-h4 ml-2 leading-none">{formatThaiDate(dateISO, 'EEEE d MMMM yyyy')}</span>
           <span className="ml-3 inline-flex items-center gap-2">
-            {!isLoading && <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />}
+            {!isLoading && <SavedBadge isSaved={isSaved} savedAgo={savedAgo} />}
             <StreakBadge />
           </span>
         </div>
@@ -288,7 +289,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {!isLoading && <SavedBadge isSaved={isSaved} savedAgo={savedAgo} entryCount={entryCount} />}
+          {!isLoading && <SavedBadge isSaved={isSaved} savedAgo={savedAgo} />}
           <StreakBadge />
         </div>
         <MobileDateStrip dateISO={dateISO} onPick={(iso) => { window.location.hash = `#/daily/${iso}`; }} />
@@ -311,6 +312,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
           day={day}
           dayInfo={dayInfo}
           otTotal={otPreview?.total ?? null}
+          breakMinutes={breakMinutes}
           onEdit={() => setIsEditing(true)}
         />
       ) : (
@@ -600,15 +602,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
   );
 }
 
-function SavedBadge({
-  isSaved,
-  savedAgo,
-  entryCount,
-}: {
-  isSaved: boolean;
-  savedAgo: string | null;
-  entryCount: number;
-}) {
+function SavedBadge({ isSaved, savedAgo }: { isSaved: boolean; savedAgo: string | null }) {
   if (!isSaved) {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-1.5 border-dashed border-ink-300 bg-cream-50 font-mono text-[11px] text-ink-500">
@@ -621,7 +615,6 @@ function SavedBadge({
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-1.5 border-ink-900 bg-mint-soft shadow-stamp-sm font-mono text-[11px] text-ink-900 leading-none">
       <CheckCircle2 size={13} className="text-ink-900 shrink-0" />
       <span className="font-bold">บันทึกแล้ว</span>
-      {entryCount > 0 && <span className="text-ink-700">· {entryCount} entry</span>}
       {savedAgo && <span className="text-ink-500 hidden sm:inline">· {savedAgo}</span>}
     </span>
   );

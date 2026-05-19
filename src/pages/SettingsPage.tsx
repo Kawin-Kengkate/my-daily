@@ -19,6 +19,7 @@ export function SettingsPage() {
     salary: 0,
     work_start: '08:00',
     work_end: '16:40',
+    break_minutes: 40,
     ot_rate_weekday: 1.5,
     ot_rate_holiday_day: 1.5,
     ot_rate_holiday_night: 3,
@@ -30,6 +31,7 @@ export function SettingsPage() {
       salary: settings.salary,
       work_start: settings.work_start.slice(0, 5),
       work_end: settings.work_end.slice(0, 5),
+      break_minutes: settings.break_minutes ?? 40,
       ot_rate_weekday: settings.ot_rate_weekday,
       ot_rate_holiday_day: settings.ot_rate_holiday_day,
       ot_rate_holiday_night: settings.ot_rate_holiday_night,
@@ -91,6 +93,18 @@ export function SettingsPage() {
             <div className="mt-1.5">
               <TimePicker value={form.work_end} onChange={(v) => setForm({ ...form, work_end: v })} />
             </div>
+          </div>
+          <div className="mt-3">
+            <Field
+              label="พักกลางวัน (วันธรรมดา)"
+              type="number"
+              min={0}
+              max={120}
+              value={form.break_minutes}
+              onChange={(e) => setForm({ ...form, break_minutes: Number(e.target.value) })}
+              hint="หักออกจากชั่วโมงทำงานปกติ (ไม่ใช่ OT)"
+              suffix="นาที"
+            />
           </div>
         </div>
       </Card>

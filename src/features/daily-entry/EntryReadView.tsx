@@ -5,6 +5,7 @@ import { Sticker } from '@/components/Sticker';
 import { Pill } from '@/components/Pill';
 import { ProjectCode } from '@/components/ProjectCode';
 import { formatMoney, formatHours } from '@/lib/format';
+import { calcWorkHours, parseHHMM } from '@/lib/ot';
 import { useProjects } from '@/hooks/useProjects';
 import type { DayWithEntries, LocationKind, Project } from '@/types/db';
 import type { DayInfo } from '@/lib/calendar';
@@ -17,28 +18,35 @@ const LOCATION_LABEL: Record<LocationKind, { label: string; color: 'mint' | 'per
   holiday:  { label: 'Holiday',  color: 'lemon' },
 };
 
-function hoursBetween(start: string, end: string): number {
-  const [sh, sm] = start.split(':').map(Number);
-  const [eh, em] = end.split(':').map(Number);
-  return Math.max(0, (eh * 60 + (em || 0) - sh * 60 - (sm || 0)) / 60);
+function entryHours(start: string, end: string): number {
+  const s = parseHHMM(start);
+  const e = parseHHMM(end);
+  return Math.max(0, e - s) / 60;
 }
 
 interface Props {
   day: DayWithEntries;
   dayInfo: DayInfo;
   otTotal: number | null;
+  breakMinutes: number;
   onEdit: () => void;
 }
 
-export function EntryReadView({ day, dayInfo, otTotal, onEdit }: Props) {
+export function EntryReadView({ day, dayInfo, otTotal, breakMinutes, onEdit }: Props) {
   const { data: projects = [] } = useProjects();
   const projectMap = new Map<string, Project>(projects.map((p) => [p.id, p]));
 
   const locConf = LOCATION_LABEL[day.location];
   const entries = day.entries ?? [];
-  const totalHours = entries.reduce((s, e) => s + hoursBetween(e.start_time.slice(0, 5), e.end_time.slice(0, 5)), 0);
   const isLeave = day.location === 'leave';
   const isHoliday = day.is_holiday || day.location === 'holiday';
+
+  const totalHours = calcWorkHours(
+    entries.map((e) => ({ start_time: e.start_time.slice(0, 5), end_time: e.end_time.slice(0, 5) })),
+    breakMinutes,
+    isHoliday,
+    day.location,
+  );
   const holidayLabel = dayInfo.label;
 
   return (
@@ -47,9 +55,9 @@ export function EntryReadView({ day, dayInfo, otTotal, onEdit }: Props) {
       <div className="p-4 sm:p-5 flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <Sticker color={locConf.color} rotate={-2}>{locConf.label}</Sticker>
-          {isHoliday && !isLeave && (
+          {day.is_holiday && day.location !== 'holiday' && (
             <Sticker color="lemon" rotate={2}>
-              {holidayLabel ? `🎉 ${holidayLabel}` : '🎉 วันหยุด'}
+              {holidayLabel ? `🎉 ${holidayLabel}` : 'is holiday'}
             </Sticker>
           )}
         </div>
@@ -85,7 +93,7 @@ export function EntryReadView({ day, dayInfo, otTotal, onEdit }: Props) {
               const project = projectMap.get(e.project_id);
               const start = e.start_time.slice(0, 5);
               const end = e.end_time.slice(0, 5);
-              const hrs = hoursBetween(start, end);
+              const hrs = entryHours(start, end);
               return (
                 <li key={e.id} className="p-4 sm:p-5 border-b-1.5 border-dashed border-ink-300 last:border-b-0">
                   <div className="flex items-start gap-3">
@@ -137,7 +145,7 @@ export function EntryReadView({ day, dayInfo, otTotal, onEdit }: Props) {
           </ul>
 
           {/* Footer: totals */}
-          <div className="border-t-1.5 border-ink-900 px-4 sm:px-5 py-3 flex items-center justify-between flex-wrap gap-2 bg-paper">
+          <div className="border-t-1.5 border-ink-900 px-4 sm:px-5 py-3 flex items-center justify-between flex-wrap gap-2 bg-paper rounded-b-card">
             <div className="flex items-center gap-2 font-body text-sm">
               <span className="text-ink-500">รวม</span>
               <span className="font-display font-bold text-h4 text-ink-900">{totalHours.toFixed(totalHours % 1 === 0 ? 0 : 1)} ชม.</span>

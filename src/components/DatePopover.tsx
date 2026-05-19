@@ -31,7 +31,7 @@ export function DatePopover({ value, onChange, className, buttonClassName }: Pro
         <button
           type="button"
           className={cn(
-            'h-9 px-3 bg-paper border-1.5 border-ink-900 rounded-field shadow-stamp-sm font-mono font-bold text-sm hover:bg-cream-100',
+            'h-9 px-3 bg-paper border-1.5 border-ink-900 rounded-field shadow-stamp-sm font-body font-semibold text-sm hover:bg-cream-100',
             buttonClassName,
           )}
         >
@@ -103,14 +103,14 @@ export function DatePopover({ value, onChange, className, buttonClassName }: Pro
             <button
               type="button"
               onClick={() => { onChange(toISO(today)); setOpen(false); }}
-              className="font-mono text-xs text-ink-700 hover:text-ink-900 underline"
+              className="font-body text-sm text-ink-700 hover:text-ink-900 underline"
             >
               วันนี้
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="font-mono text-xs text-ink-500 hover:text-ink-900"
+              className="font-body text-sm text-ink-500 hover:text-ink-900"
             >
               ปิด
             </button>

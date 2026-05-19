@@ -52,7 +52,7 @@ export function parseHHMM(t: string): number {
 
 interface Interval { start: number; end: number; }
 
-function mergeIntervals(intervals: Interval[]): Interval[] {
+export function mergeIntervals(intervals: Interval[]): Interval[] {
   const sorted = [...intervals]
     .filter((i) => i.end > i.start)
     .sort((a, b) => a.start - b.start);
@@ -66,6 +66,27 @@ function mergeIntervals(intervals: Interval[]): Interval[] {
     }
   }
   return out;
+}
+
+/**
+ * คำนวณชั่วโมงทำงานจริง (non-OT) จาก entries
+ * — merge overlapping intervals ก่อน แล้วหัก break_minutes สำหรับวันธรรมดา
+ */
+export function calcWorkHours(
+  entries: OTEntryInput[],
+  breakMinutes: number,
+  isHoliday: boolean,
+  location: string,
+): number {
+  const merged = mergeIntervals(
+    entries
+      .filter((e) => e.start_time && e.end_time)
+      .map((e) => ({ start: parseHHMM(e.start_time), end: parseHHMM(e.end_time) })),
+  );
+  const totalMin = merged.reduce((s, iv) => s + (iv.end - iv.start), 0);
+  const isWorkday = !isHoliday && location !== 'leave' && location !== 'training' && location !== 'holiday';
+  const deduct = isWorkday ? breakMinutes : 0;
+  return Math.max(0, totalMin - deduct) / 60;
 }
 
 /** ตัดช่วง [cutStart, cutEnd] ออกจาก intervals (เช่น พักเย็น 16:40-17:00) */

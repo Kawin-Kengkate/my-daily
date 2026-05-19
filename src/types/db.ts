@@ -23,6 +23,7 @@ export interface UserSettings {
   ot_rate_holiday_day: number;
   ot_rate_holiday_night: number;
   quick_presets: QuickPreset[] | null;
+  break_minutes: number | null;  // พักกลางวัน (min) — default 40, null = ใช้ default
   updated_at: string;
 }
 

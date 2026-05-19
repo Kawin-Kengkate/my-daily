@@ -22,11 +22,11 @@ export function MonthPicker({ value, onChange, className }: Props) {
         <button
           type="button"
           className={cn(
-            'h-10 px-3 flex items-center gap-2 bg-paper border-1.5 border-ink-900 rounded-field shadow-stamp-sm font-mono font-bold hover:bg-cream-100',
+            'h-10 px-3 flex items-center gap-2 bg-paper border-1.5 border-ink-900 rounded-field shadow-stamp-sm font-body font-semibold hover:bg-cream-100',
             className,
           )}
         >
-          <span>{MONTHS_TH[m - 1]} {y + 543}</span>
+          <span>{MONTHS_TH[m - 1]} {y}</span>
           <ChevronDown size={14} className="text-ink-500" />
         </button>
       </Popover.Trigger>
@@ -44,7 +44,7 @@ export function MonthPicker({ value, onChange, className }: Props) {
             >
               <ChevronLeft size={14} />
             </button>
-            <div className="font-display font-bold text-sm">{viewYear + 543} / {viewYear}</div>
+            <div className="font-display font-bold text-sm">{viewYear}</div>
             <button
               type="button"
               onClick={() => setViewYear(viewYear + 1)}
@@ -66,7 +66,7 @@ export function MonthPicker({ value, onChange, className }: Props) {
                     setOpen(false);
                   }}
                   className={cn(
-                    'h-9 rounded-field font-mono text-sm border-1.5 transition-all',
+                    'h-9 rounded-field font-body text-sm border-1.5 transition-all',
                     isSel
                       ? 'bg-tangerine border-ink-900 font-bold shadow-stamp-sm'
                       : 'border-transparent hover:border-ink-900 hover:bg-cream-100',
@@ -86,14 +86,14 @@ export function MonthPicker({ value, onChange, className }: Props) {
                 onChange(`${now.getFullYear()}-${mm}`);
                 setOpen(false);
               }}
-              className="font-mono text-xs text-ink-700 hover:text-ink-900 underline"
+              className="font-body text-sm text-ink-700 hover:text-ink-900 underline"
             >
               เดือนนี้
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="font-mono text-xs text-ink-500 hover:text-ink-900"
+              className="font-body text-sm text-ink-500 hover:text-ink-900"
             >
               ปิด
             </button>

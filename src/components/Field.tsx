@@ -29,11 +29,11 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
         <input
           ref={ref}
           {...props}
-          className="flex-1 bg-transparent font-mono text-sm font-bold outline-none placeholder:text-ink-300"
+          className="flex-1 bg-transparent font-body text-sm font-semibold outline-none placeholder:text-ink-300"
         />
-        {suffix && <span className="font-mono text-hint text-ink-500">{suffix}</span>}
+        {suffix && <span className="font-body text-hint text-ink-500">{suffix}</span>}
       </div>
-      {hint && <p className="mt-1 font-mono text-[10px] text-ink-500">{hint}</p>}
+      {hint && <p className="mt-1 font-body text-xs text-ink-500">{hint}</p>}
     </div>
   );
 });

@@ -68,10 +68,10 @@ export function ProjectPicker({
               >
                 {selected.code}
               </code>
-              <span className="truncate text-ink-900 text-xs">{selected.name}</span>
+              <span className="truncate font-body text-ink-900 text-sm">{selected.name}</span>
             </span>
           ) : (
-            <span className="text-ink-300 font-normal text-sm">{placeholder}</span>
+            <span className="font-body font-normal text-sm text-ink-300">{placeholder}</span>
           )}
           <ChevronDown size={14} className="text-ink-500 shrink-0 ml-1" />
         </button>
