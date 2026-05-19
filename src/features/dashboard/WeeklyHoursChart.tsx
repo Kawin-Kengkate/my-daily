@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import type { TooltipProps } from 'recharts';
 import type { DayWithEntries } from '@/types/db';
-import type { OTSettings } from '@/lib/ot';
-import { calculateOT, parseHHMM } from '@/lib/ot';
+import { calculateOT, calcWorkHours } from '@/lib/ot';
+import type { UserSettings } from '@/types/db';
 import { getISOWeek } from 'date-fns';
 
 function WeekTooltip({ active, payload, label }: TooltipProps<number, string>) {
@@ -31,7 +31,7 @@ export function WeeklyHoursChart({
   settings,
 }: {
   days: DayWithEntries[];
-  settings: OTSettings | null | undefined;
+  settings: UserSettings | null | undefined;
 }) {
   const data = useMemo(() => {
     const byWeek: Record<string, { week: string; regular: number; ot: number }> = {};
@@ -39,14 +39,20 @@ export function WeeklyHoursChart({
       const wk = `W${getISOWeek(new Date(d.date + 'T00:00:00'))}`;
       byWeek[wk] ??= { week: wk, regular: 0, ot: 0 };
 
-      // regular = total paid before 17:00 on weekday, before 8:00 isn't counted but OK
-      const totalMin = d.entries.reduce((s, e) => s + Math.max(0, parseHHMM(e.end_time) - parseHHMM(e.start_time)), 0);
+      const breakMin = settings?.break_minutes ?? 40;
+      const isHoliday = d.is_holiday || d.location === 'holiday';
+      const effectiveHours = calcWorkHours(
+        d.entries.map((e) => ({ start_time: e.start_time.slice(0, 5), end_time: e.end_time.slice(0, 5) })),
+        breakMin,
+        isHoliday,
+        d.location,
+      );
       let otHours = 0;
       if (settings) {
         const ot = calculateOT({ is_holiday: d.is_holiday, location: d.location }, d.entries, settings);
         otHours = ot.hours15x + ot.hours3x;
       }
-      const regular = Math.max(0, totalMin / 60 - otHours);
+      const regular = Math.max(0, effectiveHours - otHours);
       byWeek[wk].regular += regular;
       byWeek[wk].ot += otHours;
     }

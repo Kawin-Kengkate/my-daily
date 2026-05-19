@@ -5,7 +5,7 @@ import { Sticker } from '@/components/Sticker';
 import { Pill } from '@/components/Pill';
 import { ProjectCode } from '@/components/ProjectCode';
 import { formatMoney, formatHours } from '@/lib/format';
-import { calcWorkHours, parseHHMM } from '@/lib/ot';
+import { calcWorkHours } from '@/lib/ot';
 import { useProjects } from '@/hooks/useProjects';
 import type { DayWithEntries, LocationKind, Project } from '@/types/db';
 import type { DayInfo } from '@/lib/calendar';
@@ -18,11 +18,6 @@ const LOCATION_LABEL: Record<LocationKind, { label: string; color: 'mint' | 'per
   holiday:  { label: 'Holiday',  color: 'lemon' },
 };
 
-function entryHours(start: string, end: string): number {
-  const s = parseHHMM(start);
-  const e = parseHHMM(end);
-  return Math.max(0, e - s) / 60;
-}
 
 interface Props {
   day: DayWithEntries;
@@ -93,7 +88,12 @@ export function EntryReadView({ day, dayInfo, otTotal, breakMinutes, onEdit }: P
               const project = projectMap.get(e.project_id);
               const start = e.start_time.slice(0, 5);
               const end = e.end_time.slice(0, 5);
-              const hrs = entryHours(start, end);
+              const hrs = calcWorkHours(
+                [{ start_time: start, end_time: end }],
+                breakMinutes,
+                isHoliday,
+                day.location,
+              );
               return (
                 <li key={e.id} className="p-4 sm:p-5 border-b-1.5 border-dashed border-ink-300 last:border-b-0">
                   <div className="flex items-start gap-3">
