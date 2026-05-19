@@ -96,7 +96,7 @@ export function ProjectPicker({
             placeholder="ค้นหา code หรือชื่อ…"
             className={cn(
               'w-full h-8 px-2 mb-2 bg-cream-50 border-1.5 border-ink-900 rounded-field shrink-0',
-              'font-mono text-xs outline-none placeholder:text-ink-300',
+              'font-body text-sm outline-none placeholder:text-ink-300',
               'focus-visible:ring-2 focus-visible:ring-tangerine focus-visible:ring-offset-1',
             )}
           />
@@ -107,7 +107,7 @@ export function ProjectPicker({
                 type="button"
                 onClick={() => handleSelect('')}
                 className={cn(
-                  'h-8 w-full px-2 text-left rounded-field border-1.5 font-mono text-xs transition-all',
+                  'h-8 w-full px-2 text-left rounded-field border-1.5 font-body text-sm transition-all',
                   !value
                     ? 'bg-cream-200 border-ink-900 font-bold text-ink-700'
                     : 'border-transparent hover:border-ink-900 hover:bg-cream-100 text-ink-400',
@@ -118,7 +118,7 @@ export function ProjectPicker({
             )}
 
             {filtered.length === 0 && (
-              <p className="px-2 py-4 text-center font-mono text-xs text-ink-500">ไม่พบโปรเจค</p>
+              <p className="px-2 py-4 text-center font-body text-sm text-ink-500">ไม่พบโปรเจค</p>
             )}
 
             {filtered.map((p) => (
@@ -140,7 +140,7 @@ export function ProjectPicker({
                 >
                   {p.code}
                 </code>
-                <span className="truncate font-mono text-xs text-ink-900">{p.name}</span>
+                <span className="truncate font-body text-sm text-ink-900">{p.name}</span>
               </button>
             ))}
           </div>

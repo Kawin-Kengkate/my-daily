@@ -229,7 +229,7 @@ export function BulkApplyModal({ open, onOpenChange, defaultMonth }: Props) {
 
           {/* Footer */}
           <div className="mt-5 pt-4 border-t-1.5 border-ink-900 flex items-center justify-between gap-3 flex-wrap">
-            <div className="font-mono text-sm">
+            <div className="font-body text-sm">
               <span className="text-ink-900 font-bold">{toApply.length}</span> วันจะถูก apply
               {skipped > 0 && (
                 <span className="text-ink-500"> · skip {skipped}</span>

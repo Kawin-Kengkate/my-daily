@@ -67,7 +67,7 @@ export function HolidayPrefillBanner({ dateISO, daySaved }: Props) {
         <div className="font-display font-bold text-h4 leading-tight">
           ช่วงวันหยุด {run.dates.length} วัน · {formatThaiDate(run.from, 'd MMM')} – {formatThaiDate(run.to, 'd MMM yy')}
         </div>
-        <div className="font-mono text-xs text-ink-700 mt-1">
+        <div className="font-body text-sm text-ink-700 mt-1">
           ยังไม่ได้บันทึก {missingDates.length} วัน — pre-fill เป็น <b>holiday</b> ให้ครบเลย?
         </div>
       </div>

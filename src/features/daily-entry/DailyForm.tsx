@@ -3,6 +3,7 @@ import { notify } from '@/lib/notify';
 import { formatDistanceToNow } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { Trash2, Plus, Copy, CheckCircle2, CalendarCheck, Layers } from 'lucide-react';
+import { EntryReadView } from './EntryReadView';
 import { DatePopover } from '@/components/DatePopover';
 import { MobileDateStrip } from './MobileDateStrip';
 import { Button } from '@/components/ui/button';
@@ -68,8 +69,14 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
   const [isHoliday, setIsHoliday] = useState<boolean>(dayInfo.type === 'holiday');
   const [note, setNote] = useState('');
   const [entries, setEntries] = useState<EntryDraft[]>([blankEntry()]);
+  const [isEditing, setIsEditing] = useState(false);
   const focusIdxRef = useRef<number | null>(null);
   const formRef = useRef<HTMLDivElement>(null);
+
+  // reset edit toggle whenever the date changes
+  useEffect(() => {
+    setIsEditing(false);
+  }, [dateISO]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -165,6 +172,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
         });
         clearDraft(dateISO);
         notify.success('บันทึกแล้ว ✓');
+        if (!isToday) setIsEditing(false);
       } catch (err) {
         notify.error(friendlyDbError(err, 'บันทึกไม่สำเร็จ'));
       }
@@ -195,6 +203,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
       });
       clearDraft(dateISO);
       notify.success('บันทึกแล้ว ✓');
+      if (!isToday) setIsEditing(false);
     } catch (err) {
       notify.error('save error: ' + (err as Error).message);
     }
@@ -297,12 +306,19 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
 
       {isLoading ? (
         <Skeleton className="h-96" rounded="card" bordered />
+      ) : day && !isToday && !isEditing ? (
+        <EntryReadView
+          day={day}
+          dayInfo={dayInfo}
+          otTotal={otPreview?.total ?? null}
+          onEdit={() => setIsEditing(true)}
+        />
       ) : (
         <>
       {tooLong && !skipEntries && (
         <Card className="p-3 bg-rose-soft border-ink-900 flex items-center gap-2">
           <span className="text-lg">⚠️</span>
-          <span className="font-mono text-sm">
+          <span className="font-body text-sm">
             รวม <b>{totalHours.toFixed(1)} ชม.</b> ในวันเดียว — ใส่ผิดมั้ย? (เกิน 14 ชม.)
           </span>
         </Card>
@@ -412,7 +428,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                         projects={projects}
                         error={!!err.project_id}
                       />
-                      {err.project_id && <span className="text-rose text-[10px] font-mono">{err.project_id}</span>}
+                      {err.project_id && <span className="text-rose text-[11px] font-body">{err.project_id}</span>}
                     </div>
                     <button
                       onClick={() => setEntries(entries.filter((_, i) => i !== idx))}
@@ -429,7 +445,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                         onChange={(v) => update({ start_time: v })}
                         error={!!err.start_time}
                       />
-                      {err.start_time && <span className="text-rose text-[10px] font-mono">{err.start_time}</span>}
+                      {err.start_time && <span className="text-rose text-[11px] font-body">{err.start_time}</span>}
                     </div>
                     <span className="font-mono text-ink-500 text-sm pt-2">→</span>
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
@@ -438,7 +454,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                         onChange={(v) => update({ end_time: v })}
                         error={!!err.end_time}
                       />
-                      {err.end_time && <span className="text-rose text-[10px] font-mono">{err.end_time}</span>}
+                      {err.end_time && <span className="text-rose text-[11px] font-body">{err.end_time}</span>}
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       <ProgressPicker
@@ -446,20 +462,20 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                         onChange={(v) => update({ progress: v })}
                         error={!!err.progress}
                       />
-                      {err.progress && <span className="text-rose text-[10px] font-mono">{err.progress}</span>}
+                      {err.progress && <span className="text-rose text-[11px] font-body">{err.progress}</span>}
                     </div>
                   </div>
                   <input
                     value={e.done_note}
                     onChange={(ev) => update({ done_note: ev.target.value })}
                     placeholder="ทำเสร็จ"
-                    className="h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                    className="h-9 w-full px-2.5 bg-paper border-1.5 border-ink-900 rounded-field font-body text-sm leading-none placeholder:text-ink-300"
                   />
                   <input
                     value={e.next_note}
                     onChange={(ev) => update({ next_note: ev.target.value })}
                     placeholder="ทำต่อ"
-                    className="h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                    className="h-9 w-full px-2.5 bg-paper border-1.5 border-ink-900 rounded-field font-body text-sm leading-none placeholder:text-ink-300"
                   />
                 </div>
 
@@ -471,7 +487,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                       onChange={(v) => update({ start_time: v })}
                       error={!!err.start_time}
                     />
-                    {err.start_time && <span className="text-rose text-[10px] font-mono">{err.start_time}</span>}
+                    {err.start_time && <span className="text-rose text-[11px] font-body">{err.start_time}</span>}
                   </div>
                   <div className="col-span-2 flex flex-col gap-0.5">
                     <TimePicker
@@ -479,7 +495,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                       onChange={(v) => update({ end_time: v })}
                       error={!!err.end_time}
                     />
-                    {err.end_time && <span className="text-rose text-[10px] font-mono">{err.end_time}</span>}
+                    {err.end_time && <span className="text-rose text-[11px] font-body">{err.end_time}</span>}
                   </div>
                   <div className="col-span-3 flex flex-col gap-0.5">
                     <ProjectPicker
@@ -488,7 +504,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                       projects={projects}
                       error={!!err.project_id}
                     />
-                    {err.project_id && <span className="text-rose text-[10px] font-mono">{err.project_id}</span>}
+                    {err.project_id && <span className="text-rose text-[11px] font-body">{err.project_id}</span>}
                   </div>
                   <div className="col-span-2 flex flex-col gap-0.5">
                     <ProgressPicker
@@ -496,20 +512,20 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
                       onChange={(v) => update({ progress: v })}
                       error={!!err.progress}
                     />
-                    {err.progress && <span className="text-rose text-[10px] font-mono">{err.progress}</span>}
+                    {err.progress && <span className="text-rose text-[11px] font-body">{err.progress}</span>}
                   </div>
                   <div className="col-span-2">
                     <input
                       value={e.done_note}
                       onChange={(ev) => update({ done_note: ev.target.value })}
                       placeholder="ทำเสร็จ"
-                      className="h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                      className="h-9 w-full px-2.5 bg-paper border-1.5 border-ink-900 rounded-field font-body text-sm leading-none placeholder:text-ink-300"
                     />
                     <input
                       value={e.next_note}
                       onChange={(ev) => update({ next_note: ev.target.value })}
                       placeholder="ทำต่อ"
-                      className="mt-1.5 h-9 w-full px-2 bg-paper border-1.5 border-ink-900 rounded-field font-mono text-xs"
+                      className="mt-1.5 h-9 w-full px-2.5 bg-paper border-1.5 border-ink-900 rounded-field font-body text-sm leading-none placeholder:text-ink-300"
                     />
                   </div>
                   <button
@@ -534,9 +550,9 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
             <span className="text-ink-900 font-bold">3x {formatHours(otPreview.hours3x)}</span>
             <span className="text-tangerine font-display font-bold text-h4">฿{formatMoney(otPreview.total)}</span>
           </div>
-        ) : <span className="text-ink-500 font-mono text-sm">ตั้ง salary ที่ /settings เพื่อเห็น OT preview</span>}
+        ) : <span className="text-ink-500 font-body text-sm">ตั้ง salary ที่ /settings เพื่อเห็น OT preview</span>}
         <div className="flex items-center gap-3">
-          <span className="text-ink-300 font-mono text-xs hidden lg:inline">Ctrl+D คัดลอก row · Ctrl+Enter บันทึก</span>
+          <span className="text-ink-300 font-body text-xs hidden lg:inline">Ctrl+D คัดลอก row · Ctrl+Enter บันทึก</span>
           {draftEnabled && draftSavedAt && (
             <span className="font-mono text-[10px] text-ink-500" title="draft auto-saved to this browser">
               draft saved
@@ -568,7 +584,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
             </span>
             <span className="text-tangerine font-display font-bold text-h4">฿{formatMoney(otPreview.total)}</span>
           </div>
-        ) : <span className="text-ink-500 font-mono text-xs">ตั้ง salary ก่อน</span>}
+        ) : <span className="text-ink-500 font-body text-xs">ตั้ง salary ก่อน</span>}
         <Button
           variant={isHoliday ? 'tangerine' : 'primary'}
           size="lg"
