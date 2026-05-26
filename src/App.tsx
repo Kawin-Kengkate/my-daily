@@ -18,6 +18,9 @@ const OTDashboardPage = lazy(() => import('@/pages/OTDashboardPage').then((m) =>
 const ComparePage = lazy(() => import('@/pages/ComparePage').then((m) => ({ default: m.ComparePage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const CalendarMaintenancePage = lazy(() => import('@/pages/CalendarMaintenancePage').then((m) => ({ default: m.CalendarMaintenancePage })));
+const LearningDashboardPage = lazy(() => import('@/pages/LearningDashboardPage').then((m) => ({ default: m.LearningDashboardPage })));
+const LearningCoursesPage = lazy(() => import('@/pages/LearningCoursesPage').then((m) => ({ default: m.LearningCoursesPage })));
+const LogSessionPage = lazy(() => import('@/pages/LogSessionPage').then((m) => ({ default: m.LogSessionPage })));
 
 const qc = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
@@ -62,6 +65,9 @@ export default function App() {
               <Route path="dashboard/compare" element={<ComparePage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="settings/calendar" element={<CalendarMaintenancePage />} />
+              <Route path="learning" element={<LearningDashboardPage />} />
+              <Route path="learning/new" element={<LogSessionPage />} />
+              <Route path="learning/courses" element={<LearningCoursesPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Route>

@@ -1,6 +1,9 @@
 # Daily Log & OT Dashboard — Project Instructions
 
-โปรเจคส่วนตัวของ Kawin: บันทึก daily + dashboard + คำนวณ OT
+โปรเจคส่วนตัวของ Kawin: 2 modules ใน app เดียวกัน
+- **Work module** — บันทึก daily + dashboard + คำนวณ OT
+- **Learning module** — track session การเรียน + dashboard progress + nudge (planned)
+
 **vibe code 100%** — เน้นง่าย เร็ว ใช้คนเดียว ห้าม over-engineer
 
 ## เอกสารต้องอ่าน (ลำดับสำคัญ)
@@ -44,8 +47,23 @@
   - `mint` = complete/positive
   - `peri` = projects/info/avatar
   - `rose` = leave/sensitive
-- **Custom primitives** (port จาก `mocks/src/shared.jsx`): `<Sticker>`, `<Pill>`, `<ProjectCode>`, `<Star4>`, `<Burst>`, `<Squiggle>`, `<Field>` — ใช้สิ่งเหล่านี้แทนการ inline class
+- **Custom primitives** (port จาก `mocks/src/shared.jsx`): `<Sticker>`, `<Pill>`, `<ProjectCode>`, `<Star4>`, `<Burst>`, `<Squiggle>`, `<Field>` + (planned for Learning) `<Arc>`, `<DotGrid>` — ใช้สิ่งเหล่านี้แทนการ inline class
 - **อย่าใช้ shadcn `<Calendar>` สำหรับ heatmap** — สร้าง custom grid `grid-cols-7 gap-1` แทน (Calendar shadcn ใช้แค่ date picker ปกติ)
+
+### Module Differentiation (Work vs Learning)
+
+design language เดียวกัน (border-1.5 + shadow-stamp + fonts + press state ใช้ร่วม) แต่แต่ละ module มี signature ของตัวเอง — รู้สึก "คนละห้อง" ภายใน 1 วินาทีที่เปิด:
+
+| Element | Work | Learning |
+|---|---|---|
+| Page bg | default cream | `bg-peri/5` wash (ผ่าน `LearningPageShell`) |
+| Hero decoration | `<Star4>` + `<Burst>` | `<Squiggle>` ใหญ่ + `<Arc>` |
+| Card corner | — | `<DotGrid>` มุมขวาบน (peri-300) |
+| Primary action color | tangerine | lemon |
+| Secondary accent | peri (projects), tangerine (OT) | peri (knowledge), mint (progress) |
+| Sticker variant | default | `variant="learning"` (double-border) |
+
+**กฎ:** Component primitives ที่ shared (border-1.5, shadow-stamp, press state, font, Field, Pill) ต้องใช้เหมือนกันทั้ง 2 module ห้ามแตก — ที่แตกได้คือ decoration + color emphasis + bg tint เท่านั้น
 
 ## Folder Structure
 
@@ -56,10 +74,12 @@ src/
   api/                     — Supabase client + queries (1 file/resource)
     supabase.ts
     days.ts, entries.ts, projects.ts, settings.ts
+    learningCourses.ts, learningSessions.ts        (planned)
   components/
     ui/                    — shadcn primitives (override แล้ว)
     Sticker.tsx, Pill.tsx, ProjectCode.tsx
     Star4.tsx, Burst.tsx, Squiggle.tsx
+    Arc.tsx, DotGrid.tsx                            (planned — Learning decoration)
     Field.tsx              — label + input + hint pattern
   features/
     daily-entry/           — DailyForm, TimeBlock, QuickPresets, RecentProjects, StatusPicker, DateStrip
@@ -67,12 +87,20 @@ src/
     ot-report/             — OTTable, OTSummaryBand, useCopyTable
     projects/              — ProjectCard, ProjectSparkline
     settings/              — SalarySection, WorkHoursSection, HolidaysSection, AccountSection
+    learning/                                       (planned)
+      LogSessionForm, CourseCard, CourseStatusActions
+      WeeklySummaryHero, HoursPerCourseDonut, LearningHeatmap
+      WeeklyTrendChart, RecentSessionsTable
+      LearningNudgeBanner, LearningPageShell
   pages/                   — 1 file/route (thin — compose features)
+    LearningDashboardPage, LogSessionPage, LearningCoursesPage  (planned)
   hooks/                   — useAuth, useToday, useDay, useEntries, useProjects, useSettings
+    useLearningCourses, useLearningSessions, useLearningNudge   (planned)
   lib/                     — pure utils
     ot.ts, ot.test.ts
     thai-holidays.ts
     date.ts, format.ts
+    learning.ts, learning.test.ts                   (planned — aggregate, nudge logic)
   types/                   — db.ts (map กับ Supabase schema)
   styles/                  — globals.css (copy จาก design_handoff + shadcn base)
 ```
@@ -98,9 +126,17 @@ src/
   - Abstraction ล่วงหน้าเผื่ออนาคต
   - `border` (1px default) ที่ควรเป็น `border-1.5` ตาม design
 
-## OT Calculation (จุดเดียวที่ต้องมี test)
+## OT Calculation (จุดที่ต้องมี test #1)
 
 `src/lib/ot.ts` = pure function → **เขียน unit test (Vitest) ให้ครอบทุก case ใน CONTEXT.md §OT Rules** เพราะคำนวณเงิน ผิดไม่ได้
+
+## Learning Aggregate & Nudge (จุดที่ต้องมี test #2)
+
+`src/lib/learning.ts` = pure function (planned) → ต้องมี unit test ครอบ:
+- ISO week calculation (รอบปีใหม่ระวัง)
+- Weekly aggregate (sum duration ตาม ISO week)
+- Active days count (unique dates)
+- Nudge decision tree (ดู CONTEXT.md §Learning Nudge Logic)
 
 ## Form (Daily Entry)
 

@@ -1,6 +1,9 @@
 import { NavLink, Outlet, useMatch, useResolvedPath, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CalendarDays, LayoutDashboard, Coins, FolderKanban, Settings as SettingsIcon } from 'lucide-react';
+import {
+  CalendarDays, LayoutDashboard, Coins, FolderKanban,
+  Settings as SettingsIcon, GraduationCap, BookOpen, Plus,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,11 +18,22 @@ interface NavItemDef {
   matchPaths?: string[];
 }
 
-const NAV: NavItemDef[] = [
+const WORK_NAV: NavItemDef[] = [
   { to: '/', label: 'Daily', Icon: CalendarDays, end: true, matchPaths: ['/daily', '/daily/:date'] },
   { to: '/dashboard/monthly', label: 'Dashboard', Icon: LayoutDashboard, matchPaths: ['/dashboard/quarterly', '/dashboard/compare'] },
   { to: '/dashboard/ot', label: 'OT Table', Icon: Coins },
   { to: '/projects', label: 'Projects', Icon: FolderKanban },
+];
+
+const LEARNING_NAV: NavItemDef[] = [
+  { to: '/learning', label: 'Dashboard', Icon: GraduationCap, end: true },
+  { to: '/learning/new', label: 'Log Session', Icon: Plus },
+  { to: '/learning/courses', label: 'Courses', Icon: BookOpen },
+];
+
+// Flat list สำหรับ bottom nav (mobile)
+const NAV: NavItemDef[] = [
+  ...WORK_NAV,
   { to: '/settings', label: 'Settings', Icon: SettingsIcon },
 ];
 
@@ -95,17 +109,31 @@ export function AppShell() {
             <Logo size="sm" />
             <span className="font-display font-bold text-h4">My Daily</span>
           </div>
-          <nav className="hidden md:flex items-center gap-1 ml-2 flex-1 overflow-x-auto">
-            {NAV.map((n) => (
-              <TopNavItem key={n.to} {...n} />
-            ))}
+
+          {/* Desktop nav — Work section */}
+          <nav className="hidden md:flex items-center gap-1 ml-2 overflow-x-auto">
+            <span className="font-mono text-[10px] text-ink-400 uppercase px-1 mr-1 shrink-0">Work</span>
+            {WORK_NAV.map((n) => <TopNavItem key={n.to} {...n} />)}
+            <span className="mx-2 h-5 w-px bg-ink-200 shrink-0" />
+            <span className="font-mono text-[10px] text-ink-400 uppercase px-1 mr-1 shrink-0">Learning</span>
+            {LEARNING_NAV.map((n) => <TopNavItem key={n.to} {...n} />)}
           </nav>
-          <div className="ml-auto md:ml-0 hidden md:flex items-center gap-2">
+
+          <div className="ml-auto hidden md:flex items-center gap-2">
             {user?.email && (
               <span className="text-hint font-mono text-ink-500 hidden md:inline">
                 {user.email}
               </span>
             )}
+            <NavLink
+              to="/settings"
+              className={({ isActive }) =>
+                cn('p-2 rounded-button hover:bg-cream-100 transition-colors', isActive && 'bg-cream-200')
+              }
+              aria-label="Settings"
+            >
+              <SettingsIcon size={16} />
+            </NavLink>
             <Button variant="paper" size="sm" onClick={() => signOut()}>
               Sign out
             </Button>
@@ -115,6 +143,8 @@ export function AppShell() {
       <main className="max-w-6xl mx-auto px-5 md:px-8 py-6 pb-14 md:pb-6">
         <Outlet />
       </main>
+
+      {/* Mobile bottom nav */}
       <nav
         aria-label="Primary"
         className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-paper border-t-1.5 border-ink-900 grid grid-cols-5 shadow-[0_-2px_0_0_rgba(15,27,45,0.06)]"

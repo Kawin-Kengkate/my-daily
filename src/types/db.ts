@@ -1,6 +1,7 @@
 export type LocationKind = 'wfh' | 'onsite' | 'leave' | 'training' | 'holiday';
 export type ProjectStatus = 'active' | 'on_hold' | 'done' | 'archived';
 export type CalendarOverrideKind = 'working' | 'holiday';
+export type CourseStatus = 'active' | 'paused' | 'done' | 'dropped';
 
 export interface Profile {
   id: string;
@@ -24,6 +25,32 @@ export interface UserSettings {
   ot_rate_holiday_night: number;
   quick_presets: QuickPreset[] | null;
   break_minutes: number | null;  // พักกลางวัน (min) — default 40, null = ใช้ default
+  learning_weekly_target_hours: number | null; // default 10
+  updated_at: string;
+}
+
+export interface LearningCourse {
+  id: string;
+  user_id: string;
+  name: string;
+  code: string;
+  phase: number | null;
+  status: CourseStatus;
+  target_hours_per_week: number | null;
+  started_at: string | null;
+  finished_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LearningSession {
+  id: string;
+  user_id: string;
+  course_id: string;
+  date: string;        // 'YYYY-MM-DD'
+  duration_min: number;
+  note: string | null;
+  created_at: string;
   updated_at: string;
 }
 

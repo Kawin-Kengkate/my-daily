@@ -7,7 +7,10 @@
 
 ## ภาพรวมการใช้งาน
 
-User คนเดียว (Kawin) บันทึก daily log ทุกวันทำงาน:
+User คนเดียว (Kawin) ใช้ app นี้ทำ 2 เรื่องใน 2 module แยกกัน:
+
+### Work module (mature)
+บันทึก daily log ทุกวันทำงาน:
 - เวลาเริ่ม-เลิกงาน
 - WFH / Onsite / ลา / training
 - โปรเจคที่ทำ + % progress + สิ่งที่ทำเสร็จ + สิ่งที่ทำต่อ
@@ -17,6 +20,14 @@ User คนเดียว (Kawin) บันทึก daily log ทุกวั�
 1. กรอกเร็ว ใช้บนมือถือได้
 2. Dashboard รายเดือน/ควอเตอร์ ดูภาพรวมงาน
 3. ตาราง OT สรุปไว้เอาไปกรอกฟอร์มเบิก
+
+### Learning module (planned)
+Track session การเรียนของ user (จาก `learning-plan.md`):
+- Log session ทุกครั้งที่นั่งเรียน (duration, course, note)
+- Dashboard เห็น progress สัปดาห์/เดือน/quarter
+- Nudge banner ใน-แอป เมื่อกลางสัปดาห์แล้วยังไม่ถึงเป้า
+
+**Primary use case คือ Work** — user เข้ามากรอก daily เป็นหลัก, Learning module เป็น secondary section ที่อยู่ใน sidebar แยก
 
 ---
 
@@ -162,16 +173,116 @@ User override ได้ผ่าน `days.is_holiday` toggle ในหน้า 
 
 ## สิ่งที่ตัดออกจาก scope (ตั้งใจ)
 
+ของ **Work module:**
 - ❌ Import Excel เก่า — เริ่มข้อมูลใหม่ตั้งแต่ deploy
 - ❌ Export OT เป็น Excel — copy ตามองจาก table พอ
 - ❌ Time tracking ละเอียดระดับนาทีต่อโปรเจค — แค่บอกได้ว่าเดือนนั้นแตะโปรเจคไหน
 - ❌ Multi-user / sharing — ใช้คนเดียว
 - ❌ Mobile app — responsive web พอ
-- ❌ Reminder / notification — ไม่ต้องเตือนวันเก่าที่ไม่ได้กรอก
+- ❌ Reminder / notification ของ daily — ไม่ต้องเตือนวันเก่าที่ไม่ได้กรอก (ตั้งใจ user เอง)
 - ❌ Auto-save draft — manual save ป้องกัน partial entry
 - ❌ Pomodoro / timer / live tracking — กรอกย้อนหลังเอง
 
+ของ **Learning module** (ดู §Learning Module ด้านล่าง):
+- ❌ Notes editor / markdown / file attachment
+- ❌ Per-course progress % (session-based ไม่มี denominator)
+- ❌ Daily streak counter (punishing)
+- ❌ Push notification / Email / LINE (in-app nudge เพียงพอ)
+- ❌ Hard limit "2 active courses" (ขัด philosophy "guideline ไม่ใช่ contract")
+
 ถ้าจะเพิ่ม feature เหล่านี้ — คุยกับ user ก่อน (อาจเปลี่ยนใจได้ แต่ default = ไม่ทำ)
+
+---
+
+## Learning Module (planned)
+
+### ปัญหาที่แก้
+แผนใน `learning-plan.md` ไม่ตอบ 2 สิ่ง:
+1. **ไม่เห็นว่าคืบหน้าแค่ไหน** — เรียนเยอะแต่วัดไม่ได้
+2. **ไม่ต่อเนื่อง** — ทิ้งเป็นสัปดาห์ๆ momentum หาย
+
+**ไม่ใช่ปัญหา:** ไม่รู้จะเรียนอะไร, เรียนแล้วลืม → ดังนั้น scope ตัด planner builder + note editor ออก
+
+### Schema decisions
+
+**`learning_courses`** — entity ที่ user track (mirror `projects` pattern)
+- `name`, `code` (2-4 chars เหมือน project code), `phase` (1-4)
+- `status` enum: `active | paused | done | dropped`
+- `target_hours_per_week` optional (สำหรับ tooltip ใน donut, ไม่ใช่ source of truth ของ weekly metric)
+
+**`learning_sessions`** — atom ของระบบ (1 row = 1 ครั้งที่นั่งเรียน)
+- `course_id`, `date`, `duration_min` (5..600), `note` (max 200)
+- **ไม่มี `start_time` / `end_time`** — self-study ไม่มี timestamp จริง, duration พอ
+- เก็บแบน 1 ระดับ ไม่มี nested topic
+
+**`user_settings.learning_weekly_target_hours`** — global target (default 10 ตาม learning-plan.md)
+- เป็น source of truth ของ weekly metric + nudge calculation
+- course.target_hours_per_week ผลรวมไม่จำเป็นต้องเท่า global
+
+### Metric design
+
+**Weekly target + active days display** (ไม่ใช้ daily streak)
+
+เหตุผล:
+- Daily streak punishing — user ทำงาน 5 วัน + บางสัปดาห์ no energy → streak แตก → demotivate (ตรงข้ามกับเป้า)
+- Weekly เพียวๆ ไม่ปกป้องจากการอัดวันเดียว → เลยแสดง active days dots เป็น display เฉยๆ (ไม่ใช่ pass/fail)
+
+**Hero widget:**
+```
+6.5 / 10 hrs    ━━━━━━░░░░ 65%       ← primary metric
+3 active days   ● ● ○ ● ○ ○ ○         ← display only
+```
+
+### Nudge logic (in-app banner)
+
+ตรวจทุกครั้งที่ render `AppShell` — pure client-side, ไม่มี backend cron / push
+
+**Decision tree (เรียงตามลำดับ — match แล้วหยุด):**
+
+| เงื่อนไข | Action |
+|---|---|
+| ไม่มี course `status='active'` | ซ่อน |
+| dismissed สัปดาห์นี้ (`localStorage[learning-nudge-{ISOweek}]`) | ซ่อน |
+| user อยู่ที่ `/learning/new` | ซ่อน |
+| `hoursLogged >= weeklyTarget` | celebrate (mint, 1 ครั้ง) |
+| todayDow ≤ 2 (จ-อ) | ซ่อน |
+| todayDow=3 (พ) และ hours=0 | Level 1 info (peri) |
+| todayDow=4 (พฤ) และ hours < 30% | Level 1 |
+| todayDow=5 (ศ) และ hours < 50% | Level 2 warning (lemon) |
+| todayDow=6 (ส) และ hours < 70% | Level 2 |
+| todayDow=7 (อา) และ hours < target | Level 3 urgent (tangerine) |
+| otherwise | ซ่อน |
+
+**Priority rule:** ถ้า `MissingDaysBanner` ของ Work แสดงอยู่ → learning nudge หลีกทาง (Work กระทบเงิน priority สูงกว่า)
+
+**Tone rule:** neutral facts + suggest, ห้ามคำกดดัน เช่น "ขี้เกียจ", "ตามหลัง" — ใช้คำเชิงข้อมูล "เหลือ X วัน, ขาด Y ชม."
+
+**Dismiss:** key เป็น ISO week → reset อัตโนมัติทุกจันทร์ใหม่
+
+### Course management — soft display
+
+กฎ "ไม่เกิน 2 คอร์สหลักพร้อมกัน" ใน learning-plan.md = อยู่ในเอกสาร ไม่ได้ enforce ในระบบ
+
+**Display in `/learning/courses` header:**
+```
+Courses    Active: 3   Paused: 2   Done: 1
+            ↑ Pill นับ ใช้สี ink-900 ปกติ ไม่ใช่ tangerine/lemon
+```
+
+- ไม่มี warning, ไม่บัง action
+- Pause/Resume = 1 คลิก ไม่ confirm
+- ไม่บังคับ pause ก่อนเพิ่ม active ใหม่
+- Paused course ยัง list อยู่ (สีจาง), session history คงอยู่ใน dashboard ย้อนหลัง แต่ไม่นับใน weekly hero ปัจจุบัน
+- เคารพ "guideline ไม่ใช่ contract" จาก learning-plan.md
+
+### Module differentiation (Work vs Learning visual)
+
+ดู `.claude/CLAUDE.md §Module Differentiation` — สรุป: ใช้ design language เดียวกัน 100% สำหรับ primitives (border-1.5, shadow-stamp, fonts, press) แต่ต่างที่:
+- Page bg (cream vs peri/5)
+- Hero decoration (Star4/Burst vs Squiggle/Arc)
+- Card corner (— vs DotGrid)
+- Primary action color (tangerine vs lemon)
+- Sticker variant (default vs double-border learning)
 
 ---
 
