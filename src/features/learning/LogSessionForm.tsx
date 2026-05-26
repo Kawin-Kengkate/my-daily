@@ -52,7 +52,7 @@ export function LogSessionForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 max-w-md">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 max-w-md pb-20 md:pb-0">
       {/* Date */}
       <div>
         <label className="font-display font-bold text-label text-ink-500 uppercase">วันที่</label>
@@ -144,8 +144,8 @@ export function LogSessionForm() {
         {errors.note && <p className="mt-1 text-xs font-body text-rose">{errors.note.message}</p>}
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-1">
+      {/* Desktop actions */}
+      <div className="hidden md:flex gap-3 pt-1">
         <Button
           type="submit"
           disabled={isSubmitting || activeCourses.length === 0}
@@ -159,6 +159,28 @@ export function LogSessionForm() {
           onClick={() => navigate(-1)}
         >
           ยกเลิก
+        </Button>
+      </div>
+
+      {/* Mobile sticky action bar */}
+      <div
+        className="md:hidden fixed left-0 right-0 z-20 bg-paper/95 backdrop-blur border-t-1.5 border-ink-900 px-5 py-3 flex gap-2"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 56px)' }}
+      >
+        <Button
+          type="button"
+          variant="paper"
+          onClick={() => navigate(-1)}
+          className="flex-1"
+        >
+          ยกเลิก
+        </Button>
+        <Button
+          type="submit"
+          disabled={isSubmitting || activeCourses.length === 0}
+          className="flex-[2] bg-lemon border-1.5 border-ink-900 font-display font-bold shadow-stamp active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+        >
+          {isSubmitting ? 'กำลังบันทึก…' : 'บันทึก Session'}
         </Button>
       </div>
     </form>

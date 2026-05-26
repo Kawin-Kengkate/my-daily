@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import type { LearningCourse, LearningSession } from '@/types/db';
 import { CourseStatusActions } from './CourseStatusActions';
-import { DotGrid } from '@/components/DotGrid';
+import { Sticker } from '@/components/Sticker';
 import { cn } from '@/lib/utils';
 import { formatThaiDate } from '@/lib/date';
 
@@ -24,59 +25,64 @@ export function CourseCard({ course, allSessions }: Props) {
     [allSessions, course.id],
   );
   const totalHours = courseSessions.reduce((sum, s) => sum + s.duration_min, 0) / 60;
-  const lastSession = courseSessions[0]; // sessions sorted desc by date
+  const lastSession = courseSessions[0];
 
   const isInactive = course.status === 'paused' || course.status === 'dropped';
+  const isActive = course.status === 'active';
 
   return (
-    <div
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
       className={cn(
-        'relative p-4 bg-paper border-1.5 border-ink-900 rounded-card shadow-stamp transition-opacity',
+        'relative pl-5 pr-4 pt-5 pb-4 bg-paper border-1.5 border-ink-900 rounded-card shadow-stamp transition-shadow hover:shadow-stamp-lg',
         isInactive && 'opacity-60',
+        isActive && 'ring-1 ring-mint/40 ring-offset-2 ring-offset-peri/5',
       )}
     >
-      {/* DotGrid decoration */}
-      <DotGrid className="absolute top-3 right-3" />
-
-      <div className="flex items-start gap-3 pr-8">
-        {/* Course code */}
-        <span className="shrink-0 px-2 py-1 font-mono font-bold text-xs border-1.5 border-ink-900 rounded-chip bg-peri/10">
+      {/* Tilted code sticker */}
+      <div className="absolute -top-3 -left-2 pointer-events-none select-none">
+        <Sticker color="peri" rotate={-6} variant="learning" className="font-mono text-xs">
           {course.code}
-        </span>
-        <div className="min-w-0">
-          <div className="font-display font-bold text-sm leading-tight">{course.name}</div>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            {course.phase && (
-              <span className="font-mono text-[10px] text-ink-500">{phaseLabel[course.phase]}</span>
+        </Sticker>
+      </div>
+
+      <div className="mt-1 pr-1">
+        <div className="font-display font-bold text-base leading-snug line-clamp-2">{course.name}</div>
+        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+          {course.phase && (
+            <span className="font-mono text-[10px] text-ink-500">{phaseLabel[course.phase]}</span>
+          )}
+          <span
+            className={cn(
+              'px-1.5 py-0.5 font-mono text-[10px] font-bold rounded-full uppercase tracking-wide',
+              statusStyle[course.status],
             )}
-            <span
-              className={cn(
-                'px-1.5 py-0.5 font-mono text-[10px] font-bold rounded-full',
-                statusStyle[course.status],
-              )}
-            >
-              {course.status}
-            </span>
-          </div>
+          >
+            {course.status}
+          </span>
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-4 font-mono text-xs text-ink-600">
-        <span>
-          <span className="font-bold text-ink-900">{totalHours.toFixed(1)}</span> ชม. รวม
-        </span>
+      <div className="mt-4 flex items-baseline gap-3 font-mono text-xs text-ink-600">
+        <div className="flex items-baseline gap-1">
+          <span className="font-display font-extrabold text-h3 text-ink-900 leading-none">
+            {totalHours.toFixed(1)}
+          </span>
+          <span className="text-[10px] text-ink-500 uppercase tracking-wide">ชม.</span>
+        </div>
         {lastSession ? (
-          <span className="text-ink-400">
+          <span className="text-ink-400 text-[11px] ml-auto">
             ล่าสุด {formatThaiDate(lastSession.date, 'd MMM yy')}
           </span>
         ) : (
-          <span className="text-ink-300">ยังไม่ได้เรียน</span>
+          <span className="text-ink-300 text-[11px] ml-auto">ยังไม่ได้เรียน</span>
         )}
       </div>
 
       <div className="mt-3 border-t border-cream-200 pt-3">
         <CourseStatusActions course={course} />
       </div>
-    </div>
+    </motion.div>
   );
 }
