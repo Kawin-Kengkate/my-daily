@@ -155,7 +155,8 @@ export function AppShell() {
   const mod = useCurrentModule();
   const subNav = mod === 'learning' ? LEARNING_NAV : WORK_NAV;
   const settingsItem: NavItemDef = { to: '/settings', label: 'Settings', Icon: SettingsIcon };
-  const bottomItems = [...subNav, settingsItem];
+  // Learning โหมด: เหลือ 3 อันพอ (Settings อยู่ใน header gear), Work: ใส่ Settings ด้วย
+  const bottomItems = mod === 'learning' ? subNav : [...subNav, settingsItem];
 
   return (
     <div className="min-h-full">
