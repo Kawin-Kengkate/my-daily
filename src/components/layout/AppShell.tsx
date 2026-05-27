@@ -159,12 +159,7 @@ export function AppShell() {
 
   return (
     <div className="min-h-full">
-      <header
-        className={cn(
-          'sticky top-0 z-30 border-b-1.5 border-ink-900 shadow-stamp-sm transition-colors',
-          mod === 'learning' ? 'bg-peri/5' : 'bg-paper',
-        )}
-      >
+      <header className="sticky top-0 z-30 bg-paper border-b-1.5 border-ink-900 shadow-stamp-sm">
         {/* Row 1: brand + module switcher + actions */}
         <div className="max-w-6xl mx-auto flex items-center gap-3 md:gap-4 px-5 md:px-8 py-3">
           <div className="flex items-center gap-2.5 pr-1">
