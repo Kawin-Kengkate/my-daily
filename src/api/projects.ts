@@ -17,6 +17,10 @@ export async function createProject(p: {
   color?: string;
   status?: ProjectStatus;
   tags?: string[];
+  kickoff_at?: string | null;
+  dev_at?: string | null;
+  uat_at?: string | null;
+  golive_at?: string | null;
 }): Promise<Project> {
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) throw new Error('not authenticated');

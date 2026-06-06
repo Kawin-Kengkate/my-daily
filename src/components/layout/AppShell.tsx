@@ -24,7 +24,7 @@ const WORK_NAV: NavItemDef[] = [
   { to: '/', label: 'Daily', Icon: CalendarDays, end: true, matchPaths: ['/daily', '/daily/:date'] },
   { to: '/dashboard/monthly', label: 'Dashboard', Icon: LayoutDashboard, matchPaths: ['/dashboard/quarterly', '/dashboard/compare'] },
   { to: '/dashboard/ot', label: 'OT Table', Icon: Coins },
-  { to: '/projects', label: 'Projects', Icon: FolderKanban },
+  { to: '/projects', label: 'Projects', Icon: FolderKanban, matchPaths: ['/projects/manage'] },
 ];
 
 const LEARNING_NAV: NavItemDef[] = [

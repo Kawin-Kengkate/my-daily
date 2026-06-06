@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 const DailyPage = lazy(() => import('@/pages/DailyPage').then((m) => ({ default: m.DailyPage })));
 const DailyListPage = lazy(() => import('@/pages/DailyListPage').then((m) => ({ default: m.DailyListPage })));
 const ProjectsPage = lazy(() => import('@/pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })));
+const ProjectsManagePage = lazy(() => import('@/pages/ProjectsManagePage').then((m) => ({ default: m.ProjectsManagePage })));
 const MonthlyDashboardPage = lazy(() => import('@/pages/MonthlyDashboardPage').then((m) => ({ default: m.MonthlyDashboardPage })));
 const QuarterlyDashboardPage = lazy(() => import('@/pages/QuarterlyDashboardPage').then((m) => ({ default: m.QuarterlyDashboardPage })));
 const OTDashboardPage = lazy(() => import('@/pages/OTDashboardPage').then((m) => ({ default: m.OTDashboardPage })));
@@ -59,6 +60,7 @@ export default function App() {
               <Route path="daily" element={<DailyListPage />} />
               <Route path="daily/:date" element={<DailyPage />} />
               <Route path="projects" element={<ProjectsPage />} />
+              <Route path="projects/manage" element={<ProjectsManagePage />} />
               <Route path="dashboard/monthly" element={<MonthlyDashboardPage />} />
               <Route path="dashboard/quarterly" element={<QuarterlyDashboardPage />} />
               <Route path="dashboard/ot" element={<OTDashboardPage />} />

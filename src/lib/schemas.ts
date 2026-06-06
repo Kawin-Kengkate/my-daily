@@ -47,8 +47,10 @@ export const ProjectDraftSchema = z.object({
   color: z.string().regex(HEX, 'รูปแบบสี #rrggbb').optional(),
   status: z.enum(['active', 'on_hold', 'done', 'archived']).optional(),
   tags: z.array(z.string().trim().min(1).max(24)).max(10).optional(),
-  started_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
-  ended_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  kickoff_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  dev_at:     z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  uat_at:     z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  golive_at:  z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
 });
 
 export type ProjectDraftInput = z.input<typeof ProjectDraftSchema>;

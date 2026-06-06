@@ -63,8 +63,10 @@ export interface Project {
   status: ProjectStatus;
   color: string;
   tags: string[];
-  started_at: string | null;
-  ended_at: string | null;
+  kickoff_at: string | null;
+  dev_at: string | null;
+  uat_at: string | null;
+  golive_at: string | null;
   done_at: string | null;
   created_at: string;
 }
