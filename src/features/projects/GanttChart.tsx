@@ -1,3 +1,4 @@
+import { Play, Code2, FlaskConical, Flag, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { todayISO } from '@/lib/date';
 import { ProjectCode } from '@/components/ProjectCode';
@@ -15,11 +16,11 @@ import {
   buildAxisColumns,
 } from '@/lib/timeline';
 
-const PHASE_EMOJI: Record<PhaseLabel, string> = {
-  'Kickoff':  '🚀',
-  'Dev':      '⚙️',
-  'UAT':      '🧪',
-  'Go-live':  '🏁',
+const PHASE_ICON: Record<PhaseLabel, LucideIcon> = {
+  'Kickoff':  Play,
+  'Dev':      Code2,
+  'UAT':      FlaskConical,
+  'Go-live':  Flag,
 };
 
 // hex → rgba ให้ background มี alpha แต่ border ยังทึบ
@@ -211,17 +212,19 @@ function GanttRow({ project: p, data, win, todayPct }: GanttRowProps) {
         {data.milestones.map((m) => {
           const pct = dateToPercent(m.date, win);
           if (pct < -3 || pct > 103) return null;
+          const Icon = PHASE_ICON[m.label];
           return (
             <div
               key={m.label}
               title={`${m.label}: ${m.date}`}
               className={cn(
-                'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 pointer-events-none text-base leading-none select-none',
+                'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 flex items-center justify-center rounded-full border-1.5 border-ink-900 shadow-stamp-sm',
+                m.isGolive ? 'h-6 w-6 bg-tangerine' : 'h-5 w-5 bg-paper',
                 m.isPast && 'opacity-40',
               )}
               style={{ left: `${pct}%` }}
             >
-              <span>{PHASE_EMOJI[m.label]}</span>
+              <Icon className={cn('text-ink-900', m.isGolive ? 'h-3.5 w-3.5' : 'h-3 w-3')} strokeWidth={2.5} />
             </div>
           );
         })}
