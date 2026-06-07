@@ -7,12 +7,20 @@ import {
   type GanttScale,
   type GanttWindow,
   type ProjectTimelineData,
+  type PhaseLabel,
   deriveProjectTimeline,
   getGanttWindow,
   dateToPercent,
   clampPct,
   buildAxisColumns,
 } from '@/lib/timeline';
+
+const PHASE_EMOJI: Record<PhaseLabel, string> = {
+  'Kickoff':  '🚀',
+  'Dev':      '⚙️',
+  'UAT':      '🧪',
+  'Go-live':  '🏁',
+};
 
 // hex → rgba ให้ background มี alpha แต่ border ยังทึบ
 function hexToRgba(hex: string, alpha: number): string {
@@ -189,19 +197,13 @@ function GanttRow({ project: p, data, win, todayPct }: GanttRowProps) {
             <div
               key={i}
               title={`${bar.label}: ${bar.start} → ${bar.end}`}
-              className="absolute top-1/2 -translate-y-1/2 h-5 rounded-sm border-1.5 border-ink-900 flex items-center px-1.5 overflow-hidden"
+              className="absolute top-1/2 -translate-y-1/2 h-5 rounded-sm border-1.5 border-ink-900"
               style={{
                 left:       `${l}%`,
                 width:      `${w}%`,
                 background: hexToRgba(p.color, alpha),
               }}
-            >
-              {w > 7 && (
-                <span className="font-display font-bold text-[10px] text-ink-900 truncate">
-                  {bar.label}
-                </span>
-              )}
-            </div>
+            />
           );
         })}
 
@@ -213,20 +215,13 @@ function GanttRow({ project: p, data, win, todayPct }: GanttRowProps) {
             <div
               key={m.label}
               title={`${m.label}: ${m.date}`}
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 pointer-events-none"
+              className={cn(
+                'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 pointer-events-none text-base leading-none select-none',
+                m.isPast && 'opacity-40',
+              )}
               style={{ left: `${pct}%` }}
             >
-              {m.isGolive ? (
-                <div className="h-3.5 w-3.5 rotate-45 bg-tangerine border-1.5 border-ink-900" />
-              ) : (
-                <div
-                  className={cn(
-                    'h-3 w-3 rotate-45 border-1.5 border-ink-900',
-                    m.isPast && 'opacity-40',
-                  )}
-                  style={{ background: m.isPast ? '#999' : p.color }}
-                />
-              )}
+              <span>{PHASE_EMOJI[m.label]}</span>
             </div>
           );
         })}
