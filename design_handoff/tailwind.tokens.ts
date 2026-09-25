@@ -89,6 +89,7 @@ export const myDailyTokens = {
     h5:       ['16px', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
     h4:       ['17px', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
     h3:       ['18px', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
+    h2:       ['28px', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
     stat:     ['28px', { lineHeight: '0.95', letterSpacing: '-0.03em' }],
     'stat-lg':['36px', { lineHeight: '0.95', letterSpacing: '-0.04em' }],
     display:  ['44px', { lineHeight: '1',    letterSpacing: '-0.04em' }],
