@@ -131,6 +131,7 @@
 | `text-display` | 44px | 800 | -0.04em | Section page heads, big stat values |
 | `text-stat-lg` | 36px | 800 | -0.04em | OT total figures |
 | `text-stat` | 28px | 800 | -0.03em | Donut center, stat block values |
+| `text-h2` | 28px | 800 | -0.03em | Learning page titles, big numbers in rings / steppers / compare cards |
 | `text-h3` | 18px | 700 | -0.02em | Card titles |
 | `text-h4` | 17px | 700 | -0.02em | Project name in cards |
 | `text-h5` | 16px | 700 | -0.02em | Chart card titles |
