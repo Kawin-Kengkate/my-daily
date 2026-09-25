@@ -5,11 +5,11 @@ export type StickerColor = 'lemon' | 'tangerine' | 'mint' | 'peri' | 'rose';
 export type StickerVariant = 'default' | 'learning';
 
 const colorMap: Record<StickerColor, string> = {
-  lemon: 'bg-lemon text-ink-900',
-  tangerine: 'bg-tangerine text-paper',
-  mint: 'bg-mint text-paper',
-  peri: 'bg-peri text-paper',
-  rose: 'bg-rose text-ink-900',
+  lemon: 'bg-lemon text-on-lemon',
+  tangerine: 'bg-tangerine text-on-tangerine',
+  mint: 'bg-mint text-on-mint',
+  peri: 'bg-peri text-on-peri',
+  rose: 'bg-rose text-on-rose',
 };
 
 export function Sticker({

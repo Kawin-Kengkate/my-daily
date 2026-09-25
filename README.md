@@ -47,8 +47,15 @@ Push to `main` → Vercel auto-deploy
 npm run dev        # local dev server
 npm run build      # production build
 npm run preview    # preview build local
-npm run test       # vitest (ครอบ src/lib/ot.ts เป็นหลัก)
+npm run test       # vitest (OT calc, learning, streak, timeline + theme contrast)
 ```
+
+## Themes 🎨
+
+5 ธีมสี — 🍭 Pop Riot (default) · 🌃 Neon Night (dark) · 🫧 Bubblegum · 🍵 Matcha · 📜 Classic Cream
+
+สลับได้ที่ปุ่ม palette บน header หรือ Settings → Theme (จำไว้ใน localStorage ต่อเครื่อง)
+สีทุกชุดอยู่ที่ `src/styles/globals.css` — รายละเอียด/กฎการใช้สีดู `design_handoff/DESIGN.md` §2
 
 ## Docs
 

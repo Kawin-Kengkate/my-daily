@@ -62,7 +62,7 @@ export function QuickPresets({ onPick }: { onPick: (p: PresetBlock) => void }) {
       {editing && !adding && (
         <button
           onClick={() => setAdding(true)}
-          className="h-7 w-7 flex items-center justify-center bg-lemon border-1.5 border-ink-900 rounded-button shadow-stamp-sm btn-press hover:brightness-95 transition-all"
+          className="h-7 w-7 flex items-center justify-center bg-lemon text-on-lemon border-1.5 border-ink-900 rounded-button shadow-stamp-sm btn-press hover:brightness-95 transition-all"
           title="เพิ่ม preset"
         >
           <Plus size={13} />
@@ -86,7 +86,7 @@ export function QuickPresets({ onPick }: { onPick: (p: PresetBlock) => void }) {
           />
           <button
             onClick={handleAdd}
-            className="h-7 px-2 bg-mint border-1.5 border-ink-900 rounded-button font-mono text-xs font-bold shadow-stamp-sm btn-press transition-all"
+            className="h-7 px-2 bg-mint text-on-mint border-1.5 border-ink-900 rounded-button font-mono text-xs font-bold shadow-stamp-sm btn-press transition-all"
           >
             <Check size={12} />
           </button>

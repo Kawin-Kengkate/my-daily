@@ -1,4 +1,7 @@
 /**
+ * ⚠️ ไฟล์ handoff ต้นฉบับ — palette ในนี้ = theme `classic`
+ * runtime ใช้ src/styles/globals.css (5 themes, channel format) — แก้สีที่นั่น ไม่ใช่ที่นี่
+ *
  * globals.css — CSS variables + fonts + base layer
  *
  * Append to your existing `src/globals.css` (or whatever entry your Tailwind

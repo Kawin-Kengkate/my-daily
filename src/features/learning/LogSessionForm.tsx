@@ -113,14 +113,14 @@ export function LogSessionForm() {
                   'relative flex flex-col items-center py-2 px-1 rounded-card border-1.5 transition-all',
                   'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
                   active
-                    ? 'bg-lemon border-ink-900 shadow-stamp'
+                    ? 'bg-lemon text-on-lemon border-ink-900 shadow-stamp'
                     : 'bg-paper border-ink-900/40 shadow-stamp-sm hover:border-ink-900',
                 )}
               >
                 <span
                   className={cn(
                     'font-mono text-[10px] uppercase',
-                    active ? 'text-ink-900 font-bold' : 'text-ink-500',
+                    active ? 'text-on-lemon font-bold' : 'text-ink-500',
                   )}
                 >
                   {d.dow}
@@ -128,7 +128,7 @@ export function LogSessionForm() {
                 <span
                   className={cn(
                     'font-display font-extrabold text-base leading-none mt-0.5',
-                    active ? 'text-ink-900' : 'text-ink-700',
+                    active ? 'text-on-lemon' : 'text-ink-700',
                   )}
                 >
                   {d.label}
@@ -137,7 +137,7 @@ export function LogSessionForm() {
                   <span
                     className={cn(
                       'absolute -top-1.5 -right-1.5 px-1 py-0 font-mono text-[8px] font-bold rounded-full border-1.5 border-ink-900',
-                      active ? 'bg-paper text-ink-900' : 'bg-peri text-paper',
+                      active ? 'bg-paper text-ink-900' : 'bg-peri text-on-peri',
                     )}
                   >
                     วันนี้
@@ -182,14 +182,14 @@ export function LogSessionForm() {
                     'relative flex items-center gap-3 pl-3 pr-3 py-3 rounded-card border-1.5 border-ink-900 text-left transition-all',
                     'active:translate-x-[1px] active:translate-y-[1px]',
                     selected
-                      ? 'bg-lemon shadow-stamp ring-2 ring-offset-2 ring-ink-900'
+                      ? 'bg-lemon text-on-lemon shadow-stamp ring-2 ring-offset-2 ring-ink-900'
                       : 'bg-paper shadow-stamp-sm hover:shadow-stamp',
                   )}
                 >
                   <span
                     className={cn(
                       'shrink-0 px-2 py-1 font-mono font-bold text-xs border-1.5 border-ink-900 rounded-chip',
-                      selected ? 'bg-paper' : 'bg-peri/15',
+                      selected ? 'bg-paper text-ink-900' : 'bg-peri/15',
                     )}
                   >
                     {c.code}
@@ -329,7 +329,8 @@ export function LogSessionForm() {
         <Button
           type="submit"
           disabled={isSubmitting || activeCourses.length === 0}
-          className="bg-lemon border-1.5 border-ink-900 font-display font-bold shadow-stamp active:translate-x-[1px] active:translate-y-[1px] active:shadow-none gap-1.5"
+          variant="lemon"
+          className="shadow-stamp gap-1.5"
         >
           <Check size={14} strokeWidth={3} />
           {isSubmitting ? 'กำลังบันทึก…' : 'บันทึก Session'}
@@ -350,7 +351,8 @@ export function LogSessionForm() {
         <Button
           type="submit"
           disabled={isSubmitting || activeCourses.length === 0}
-          className="flex-[2] bg-lemon border-1.5 border-ink-900 font-display font-bold shadow-stamp active:translate-x-[1px] active:translate-y-[1px] active:shadow-none gap-1.5"
+          variant="lemon"
+          className="flex-[2] shadow-stamp gap-1.5"
         >
           <Check size={14} strokeWidth={3} />
           {isSubmitting ? 'กำลังบันทึก…' : 'บันทึก'}

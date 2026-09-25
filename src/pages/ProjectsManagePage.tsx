@@ -15,18 +15,10 @@ import type { ProgressPoint } from '@/api/projects';
 import { ProjectDraftSchema } from '@/lib/schemas';
 import { friendlyDbError } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { PROJECT_PALETTE, DEFAULT_PROJECT_HEX, projectColor } from '@/lib/projectColor';
 import type { Project, ProjectStatus } from '@/types/db';
 
 const STATUSES: ProjectStatus[] = ['active', 'on_hold', 'done', 'archived'];
-
-const PALETTE: { name: string; hex: string }[] = [
-  { name: 'peri',      hex: '#6B7FE8' },
-  { name: 'mint',      hex: '#4FB389' },
-  { name: 'tangerine', hex: '#FF6B35' },
-  { name: 'lemon',     hex: '#F7C548' },
-  { name: 'rose',      hex: '#F291A6' },
-  { name: 'ink',       hex: '#1E1E1E' },
-];
 
 interface DraftInput {
   code: string;
@@ -35,7 +27,7 @@ interface DraftInput {
   color: string;
 }
 
-const blankDraft: DraftInput = { code: '', name: '', description: '', color: PALETTE[0].hex };
+const blankDraft: DraftInput = { code: '', name: '', description: '', color: DEFAULT_PROJECT_HEX };
 
 export function ProjectsManagePage() {
   const { data: projects = [] } = useProjects();
@@ -173,7 +165,7 @@ function ProjectRow({ project: p, progress, isEditing, onToggleEdit, onSave, onD
     code:        p.code,
     name:        p.name,
     description: p.description ?? '',
-    color:       p.color || PALETTE[0].hex,
+    color:       p.color || DEFAULT_PROJECT_HEX,
     tags:        (p.tags ?? []).join(', '),
     kickoff_at:  p.kickoff_at ?? '',
     dev_at:      p.dev_at ?? '',
@@ -191,7 +183,7 @@ function ProjectRow({ project: p, progress, isEditing, onToggleEdit, onSave, onD
           <div className="flex items-center gap-2">
             <span
               className="inline-block h-3 w-3 rounded-full border-1.5 border-ink-900"
-              style={{ background: p.color }}
+              style={{ background: projectColor(p.color) }}
             />
             <span>{p.name}</span>
           </div>
@@ -206,7 +198,7 @@ function ProjectRow({ project: p, progress, isEditing, onToggleEdit, onSave, onD
           </Select>
         </td>
         <td className="px-4 py-2">
-          <ProjectSparkline data={progress} color={p.color || '#6B7FE8'} />
+          <ProjectSparkline data={progress} color={projectColor(p.color)} />
         </td>
         <td className="px-4 py-2 font-body text-ink-700 text-xs">{p.description ?? '—'}</td>
         <td className="px-4 py-2 text-right">
@@ -354,7 +346,7 @@ function FieldEdit({ label, error, children }: { label: string; error?: string; 
 function ColorPicker({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
   return (
     <div className="flex gap-1.5 flex-wrap items-center">
-      {PALETTE.map((c) => (
+      {PROJECT_PALETTE.map((c) => (
         <button
           key={c.hex}
           type="button"
@@ -364,7 +356,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (hex: strin
             value.toLowerCase() === c.hex.toLowerCase() &&
               'ring-2 ring-ink-900 ring-offset-2 ring-offset-paper scale-110',
           )}
-          style={{ background: c.hex }}
+          style={{ background: projectColor(c.hex) }}
           title={c.name}
         />
       ))}

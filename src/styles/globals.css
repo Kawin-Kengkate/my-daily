@@ -2,40 +2,229 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Theme tokens — ทุก theme ต้องมี token ครบชุด (src/lib/theme.test.ts เช็ค contrast + ความครบ)
+ * - เก็บเป็น channel "R G B" เพื่อให้ Tailwind opacity modifier ใช้ได้ (bg-peri/20)
+ * - on-*  = สีตัวหนังสือ/ไอคอนบนพื้น accent ทึบ (bg-tangerine → text-on-tangerine)
+ * - stamp = สี hard shadow (shadow-stamp*)
+ * - theme list + label อยู่ที่ src/lib/theme.ts
+ */
 @layer base {
-  :root {
-    --cream-50:  #FBF6EC;
-    --cream-100: #F5EFE4;
-    --cream-200: #ECE3D2;
-    --cream-300: #DCCFB6;
-    --paper:     #FFFCF5;
+  /* Pop Riot — default */
+  :root,
+  [data-theme='pop'] {
+    color-scheme: light;
+    --c-cream-50:        255 248 234; /* #FFF8EA */
+    --c-cream-100:       255 242 217; /* #FFF2D9 */
+    --c-cream-200:       249 229 196; /* #F9E5C4 */
+    --c-cream-300:       237 205 156; /* #EDCD9C */
+    --c-paper:           255 253 246; /* #FFFDF6 */
+    --c-ink-200:         214 206 224; /* #D6CEE0 */
+    --c-ink-300:         175 163 192; /* #AFA3C0 */
+    --c-ink-400:         140 127 160; /* #8C7FA0 */
+    --c-ink-500:         106 92 128;  /* #6A5C80 */
+    --c-ink-600:         78 64 102;   /* #4E4066 */
+    --c-ink-700:         53 40 74;    /* #35284A */
+    --c-ink-900:         22 9 31;     /* #16091F */
+    --c-tangerine:       255 75 31;   /* #FF4B1F */
+    --c-tangerine-soft:  255 211 194; /* #FFD3C2 */
+    --c-lemon:           255 210 31;  /* #FFD21F */
+    --c-lemon-soft:      255 240 168; /* #FFF0A8 */
+    --c-mint:            0 163 108;   /* #00A36C */
+    --c-mint-soft:       182 240 214; /* #B6F0D6 */
+    --c-peri:            91 61 245;   /* #5B3DF5 */
+    --c-peri-soft:       221 212 255; /* #DDD4FF */
+    --c-rose:            240 40 122;  /* #F0287A */
+    --c-rose-soft:       255 208 228; /* #FFD0E4 */
+    --c-on-tangerine:    22 9 31;     /* #16091F */
+    --c-on-lemon:        22 9 31;     /* #16091F */
+    --c-on-mint:         22 9 31;     /* #16091F */
+    --c-on-peri:         255 253 246; /* #FFFDF6 */
+    --c-on-rose:         22 9 31;     /* #16091F */
+    --c-stamp:           22 9 31;     /* #16091F */
+  }
 
-    --ink-200: #C6CDDB;
-    --ink-300: #9AA6B8;
-    --ink-500: #5C6A80;
-    --ink-700: #2A3A52;
-    --ink-900: #0F1B2D;
+  /* Neon Night — dark */
+  [data-theme='neon'] {
+    color-scheme: dark;
+    --c-cream-50:        30 24 64;    /* #1E1840 */
+    --c-cream-100:       14 10 33;    /* #0E0A21 */
+    --c-cream-200:       49 44 78;    /* #312C4E */
+    --c-cream-300:       61 56 92;    /* #3D385C */
+    --c-paper:           23 18 47;    /* #17122F */
+    --c-ink-200:         63 56 112;   /* #3F3870 */
+    --c-ink-300:         95 87 150;   /* #5F5796 */
+    --c-ink-400:         130 121 181; /* #8279B5 */
+    --c-ink-500:         163 155 208; /* #A39BD0 */
+    --c-ink-600:         190 183 227; /* #BEB7E3 */
+    --c-ink-700:         214 208 242; /* #D6D0F2 */
+    --c-ink-900:         245 242 255; /* #F5F2FF */
+    --c-tangerine:       255 122 46;  /* #FF7A2E */
+    --c-tangerine-soft:  74 35 23;    /* #4A2317 */
+    --c-lemon:           255 225 74;  /* #FFE14A */
+    --c-lemon-soft:      64 56 18;    /* #403812 */
+    --c-mint:            52 245 168;  /* #34F5A8 */
+    --c-mint-soft:       17 63 49;    /* #113F31 */
+    --c-peri:            143 125 255; /* #8F7DFF */
+    --c-peri-soft:       50 38 128;   /* #322680 */
+    --c-rose:            255 92 173;  /* #FF5CAD */
+    --c-rose-soft:       77 26 58;    /* #4D1A3A */
+    --c-on-tangerine:    14 10 33;    /* #0E0A21 */
+    --c-on-lemon:        14 10 33;    /* #0E0A21 */
+    --c-on-mint:         14 10 33;    /* #0E0A21 */
+    --c-on-peri:         14 10 33;    /* #0E0A21 */
+    --c-on-rose:         14 10 33;    /* #0E0A21 */
+    --c-stamp:           255 61 184;  /* #FF3DB8 */
+  }
 
-    --tangerine:      #FF6B35;
-    --tangerine-soft: #FFD8C7;
-    --lemon:          #F7C548;
-    --lemon-soft:     #FCEDBD;
-    --mint:           #4FB389;
-    --mint-soft:      #C8E8D7;
-    --peri:           #6B7FE8;
-    --peri-soft:      #D7DCFA;
-    --rose:           #F291A6;
-    --rose-soft:      #FBD7DE;
+  /* Bubblegum */
+  [data-theme='bubblegum'] {
+    color-scheme: light;
+    --c-cream-50:        255 244 250; /* #FFF4FA */
+    --c-cream-100:       253 232 243; /* #FDE8F3 */
+    --c-cream-200:       240 224 234; /* #F0E0EA */
+    --c-cream-300:       237 179 210; /* #EDB3D2 */
+    --c-paper:           255 251 253; /* #FFFBFD */
+    --c-ink-200:         224 204 224; /* #E0CCE0 */
+    --c-ink-300:         188 161 194; /* #BCA1C2 */
+    --c-ink-400:         154 123 163; /* #9A7BA3 */
+    --c-ink-500:         122 88 133;  /* #7A5885 */
+    --c-ink-600:         94 61 105;   /* #5E3D69 */
+    --c-ink-700:         70 38 79;    /* #46264F */
+    --c-ink-900:         42 15 51;    /* #2A0F33 */
+    --c-tangerine:       244 81 30;   /* #F4511E */
+    --c-tangerine-soft:  255 214 200; /* #FFD6C8 */
+    --c-lemon:           255 216 74;  /* #FFD84A */
+    --c-lemon-soft:      255 241 179; /* #FFF1B3 */
+    --c-mint:            14 162 133;  /* #0EA285 */
+    --c-mint-soft:       189 242 228; /* #BDF2E4 */
+    --c-peri:            124 58 237;  /* #7C3AED */
+    --c-peri-soft:       230 218 255; /* #E6DAFF */
+    --c-rose:            255 62 154;  /* #FF3E9A */
+    --c-rose-soft:       255 189 223; /* #FFBDDF */
+    --c-on-tangerine:    42 15 51;    /* #2A0F33 */
+    --c-on-lemon:        42 15 51;    /* #2A0F33 */
+    --c-on-mint:         42 15 51;    /* #2A0F33 */
+    --c-on-peri:         255 251 253; /* #FFFBFD */
+    --c-on-rose:         42 15 51;    /* #2A0F33 */
+    --c-stamp:           42 15 51;    /* #2A0F33 */
+  }
+
+  /* Matcha */
+  [data-theme='matcha'] {
+    color-scheme: light;
+    --c-cream-50:        247 249 240; /* #F7F9F0 */
+    --c-cream-100:       236 240 223; /* #ECF0DF */
+    --c-cream-200:       228 227 204; /* #E4E3CC */
+    --c-cream-300:       197 209 166; /* #C5D1A6 */
+    --c-paper:           252 253 248; /* #FCFDF8 */
+    --c-ink-200:         201 209 196; /* #C9D1C4 */
+    --c-ink-300:         157 170 153; /* #9DAA99 */
+    --c-ink-400:         120 134 115; /* #788673 */
+    --c-ink-500:         90 105 85;   /* #5A6955 */
+    --c-ink-600:         63 79 60;    /* #3F4F3C */
+    --c-ink-700:         43 58 40;    /* #2B3A28 */
+    --c-ink-900:         20 32 21;    /* #142015 */
+    --c-tangerine:       228 97 30;   /* #E4611E */
+    --c-tangerine-soft:  248 214 192; /* #F8D6C0 */
+    --c-lemon:           237 194 58;  /* #EDC23A */
+    --c-lemon-soft:      246 235 185; /* #F6EBB9 */
+    --c-mint:            63 154 85;   /* #3F9A55 */
+    --c-mint-soft:       189 229 200; /* #BDE5C8 */
+    --c-peri:            79 107 214;  /* #4F6BD6 */
+    --c-peri-soft:       213 221 246; /* #D5DDF6 */
+    --c-rose:            217 103 126; /* #D9677E */
+    --c-rose-soft:       244 210 216; /* #F4D2D8 */
+    --c-on-tangerine:    20 32 21;    /* #142015 */
+    --c-on-lemon:        20 32 21;    /* #142015 */
+    --c-on-mint:         20 32 21;    /* #142015 */
+    --c-on-peri:         252 253 248; /* #FCFDF8 */
+    --c-on-rose:         20 32 21;    /* #142015 */
+    --c-stamp:           20 32 21;    /* #142015 */
+  }
+
+  /* Classic Cream — palette ต้นฉบับจาก design_handoff */
+  [data-theme='classic'] {
+    color-scheme: light;
+    --c-cream-50:        251 246 236; /* #FBF6EC */
+    --c-cream-100:       245 239 228; /* #F5EFE4 */
+    --c-cream-200:       236 227 210; /* #ECE3D2 */
+    --c-cream-300:       220 207 182; /* #DCCFB6 */
+    --c-paper:           255 252 245; /* #FFFCF5 */
+    --c-ink-200:         198 205 219; /* #C6CDDB */
+    --c-ink-300:         154 166 184; /* #9AA6B8 */
+    --c-ink-400:         123 136 156; /* #7B889C */
+    --c-ink-500:         92 106 128;  /* #5C6A80 */
+    --c-ink-600:         67 81 105;   /* #435169 */
+    --c-ink-700:         42 58 82;    /* #2A3A52 */
+    --c-ink-900:         15 27 45;    /* #0F1B2D */
+    --c-tangerine:       255 107 53;  /* #FF6B35 */
+    --c-tangerine-soft:  255 216 199; /* #FFD8C7 */
+    --c-lemon:           247 197 72;  /* #F7C548 */
+    --c-lemon-soft:      252 237 189; /* #FCEDBD */
+    --c-mint:            79 179 137;  /* #4FB389 */
+    --c-mint-soft:       200 232 215; /* #C8E8D7 */
+    --c-peri:            107 127 232; /* #6B7FE8 */
+    --c-peri-soft:       215 220 250; /* #D7DCFA */
+    --c-rose:            242 145 166; /* #F291A6 */
+    --c-rose-soft:       251 215 222; /* #FBD7DE */
+    --c-on-tangerine:    15 27 45;    /* #0F1B2D */
+    --c-on-lemon:        15 27 45;    /* #0F1B2D */
+    --c-on-mint:         15 27 45;    /* #0F1B2D */
+    --c-on-peri:         15 27 45;    /* #0F1B2D */
+    --c-on-rose:         15 27 45;    /* #0F1B2D */
+    --c-stamp:           15 27 45;    /* #0F1B2D */
+  }
+
+  /* สีเต็มสำหรับ inline style / SVG attribute (var(--ink-900)) —
+     ประกาศซ้ำบน [data-theme] ด้วย เพื่อให้ preview ที่ซ้อน data-theme resolve สีของตัวเอง */
+  :root,
+  [data-theme] {
+    --cream-50: rgb(var(--c-cream-50));
+    --cream-100: rgb(var(--c-cream-100));
+    --cream-200: rgb(var(--c-cream-200));
+    --cream-300: rgb(var(--c-cream-300));
+    --paper: rgb(var(--c-paper));
+    --ink-200: rgb(var(--c-ink-200));
+    --ink-300: rgb(var(--c-ink-300));
+    --ink-400: rgb(var(--c-ink-400));
+    --ink-500: rgb(var(--c-ink-500));
+    --ink-600: rgb(var(--c-ink-600));
+    --ink-700: rgb(var(--c-ink-700));
+    --ink-900: rgb(var(--c-ink-900));
+    --tangerine: rgb(var(--c-tangerine));
+    --tangerine-soft: rgb(var(--c-tangerine-soft));
+    --lemon: rgb(var(--c-lemon));
+    --lemon-soft: rgb(var(--c-lemon-soft));
+    --mint: rgb(var(--c-mint));
+    --mint-soft: rgb(var(--c-mint-soft));
+    --peri: rgb(var(--c-peri));
+    --peri-soft: rgb(var(--c-peri-soft));
+    --rose: rgb(var(--c-rose));
+    --rose-soft: rgb(var(--c-rose-soft));
+    --on-tangerine: rgb(var(--c-on-tangerine));
+    --on-lemon: rgb(var(--c-on-lemon));
+    --on-mint: rgb(var(--c-on-mint));
+    --on-peri: rgb(var(--c-on-peri));
+    --on-rose: rgb(var(--c-on-rose));
+    --stamp: rgb(var(--c-stamp));
   }
 
   html, body, #root {
     height: 100%;
   }
   body {
-    background: var(--cream-100);
+    background-color: var(--cream-100);
+    /* dot-grid texture — ตามสี ink ของแต่ละ theme */
+    background-image: radial-gradient(rgb(var(--c-ink-900) / 0.07) 1px, transparent 1.5px);
+    background-size: 22px 22px;
     color: var(--ink-900);
     font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background-color: var(--lemon);
+    color: var(--on-lemon);
   }
 }
 
@@ -54,4 +243,11 @@
       var(--cream-300) 4px 8px
     );
   }
+}
+
+/* Theme switch = circular reveal (useTheme → document.startViewTransition) — ปิด crossfade default */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

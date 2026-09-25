@@ -88,7 +88,7 @@ export function OTTable({ from, to }: { from: string; to: string }) {
               <div className="flex items-center gap-2 min-w-0">
                 <span className="font-display font-bold">{formatThaiDate(r.date, 'EEE d MMM')}</span>
                 {r.is_holiday && (
-                  <span className="font-mono text-[10px] px-1.5 py-0.5 border-1.5 border-ink-900 rounded-full bg-lemon text-ink-900 leading-none">
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 border-1.5 border-ink-900 rounded-full bg-lemon text-on-lemon leading-none">
                     หยุด
                   </span>
                 )}

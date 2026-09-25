@@ -1,6 +1,7 @@
 import { Play, Code2, FlaskConical, Flag, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { todayISO } from '@/lib/date';
+import { projectColor } from '@/lib/projectColor';
 import { ProjectCode } from '@/components/ProjectCode';
 import { Pill } from '@/components/Pill';
 import type { Project } from '@/types/db';
@@ -22,14 +23,6 @@ const PHASE_ICON: Record<PhaseLabel, LucideIcon> = {
   'UAT':      FlaskConical,
   'Go-live':  Flag,
 };
-
-// hex → rgba ให้ background มี alpha แต่ border ยังทึบ
-function hexToRgba(hex: string, alpha: number): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 // opacity ตาม endPhaseIndex: 1=Dev 2=UAT 3=Go-live
 const BAR_ALPHA: Record<number, number> = { 1: 0.45, 2: 0.68, 3: 1 };
@@ -146,7 +139,7 @@ function GanttRow({ project: p, data, win, todayPct }: GanttRowProps) {
         <div className="flex items-center gap-1.5 min-w-0">
           <span
             className="h-2 w-2 rounded-full border-1.5 border-ink-900 shrink-0"
-            style={{ background: p.color }}
+            style={{ background: projectColor(p.color) }}
           />
           <ProjectCode code={p.code} />
         </div>
@@ -202,7 +195,7 @@ function GanttRow({ project: p, data, win, todayPct }: GanttRowProps) {
               style={{
                 left:       `${l}%`,
                 width:      `${w}%`,
-                background: hexToRgba(p.color, alpha),
+                background: projectColor(p.color, alpha),
               }}
             />
           );
@@ -224,7 +217,7 @@ function GanttRow({ project: p, data, win, todayPct }: GanttRowProps) {
               )}
               style={{ left: `${pct}%` }}
             >
-              <Icon className={cn('text-ink-900', m.isGolive ? 'h-3.5 w-3.5' : 'h-3 w-3')} strokeWidth={2.5} />
+              <Icon className={cn(m.isGolive ? 'h-3.5 w-3.5 text-on-tangerine' : 'h-3 w-3 text-ink-900')} strokeWidth={2.5} />
             </div>
           );
         })}

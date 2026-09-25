@@ -10,6 +10,7 @@ import { formatMoney, formatHours } from '@/lib/format';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
 import { Sticker } from '@/components/Sticker';
 import { ProjectCode } from '@/components/ProjectCode';
+import { projectColor } from '@/lib/projectColor';
 
 export function QuarterlyDashboardPage() {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -86,9 +87,18 @@ export function QuarterlyDashboardPage() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={byMonth}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--cream-300)" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+              <XAxis dataKey="month" stroke="var(--ink-300)" tick={{ fill: 'var(--ink-500)' }} />
+              <YAxis stroke="var(--ink-300)" tick={{ fill: 'var(--ink-500)' }} />
+              <Tooltip
+                cursor={{ fill: 'rgb(var(--c-ink-900) / 0.07)' }}
+                contentStyle={{
+                  background: 'var(--paper)',
+                  border: '1.5px solid var(--ink-900)',
+                  borderRadius: 14,
+                  boxShadow: '2px 2px 0 0 var(--stamp)',
+                }}
+                labelStyle={{ color: 'var(--ink-900)', fontWeight: 700 }}
+              />
               <Bar dataKey="h15" stackId="a" fill="var(--peri)" />
               <Bar dataKey="h3" stackId="a" fill="var(--tangerine)" />
             </BarChart>
@@ -106,7 +116,7 @@ export function QuarterlyDashboardPage() {
               <div key={project.id} className="border-1.5 border-ink-900 rounded-card p-4 bg-cream-50 shadow-stamp">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="inline-block h-3 w-3 rounded-full border-1.5 border-ink-900" style={{ background: project.color }} />
+                    <span className="inline-block h-3 w-3 rounded-full border-1.5 border-ink-900" style={{ background: projectColor(project.color) }} />
                     <ProjectCode code={project.code} />
                     <span className="font-display font-bold">{project.name}</span>
                   </div>

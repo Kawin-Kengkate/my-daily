@@ -115,7 +115,8 @@ export function BulkApplyModal({ open, onOpenChange, defaultMonth }: Props) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-ink-900/30 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+        {/* scrim ต้องมืดเสมอ (ink-900 กลายเป็นสีอ่อนใน dark theme) */}
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0" />
         <Dialog.Content
           className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-[min(640px,calc(100vw-2rem))] max-h-[calc(100vh-2rem)] overflow-auto bg-paper border-1.5 border-ink-900 rounded-card shadow-stamp-lg p-5 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
         >

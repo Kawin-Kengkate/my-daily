@@ -66,9 +66,9 @@ export function WeeklyHoursChart({
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--cream-300)" />
-          <XAxis dataKey="week" />
-          <YAxis />
-          <Tooltip content={<WeekTooltip />} cursor={{ fill: 'var(--cream-100)' }} />
+          <XAxis dataKey="week" stroke="var(--ink-300)" tick={{ fill: 'var(--ink-500)' }} />
+          <YAxis stroke="var(--ink-300)" tick={{ fill: 'var(--ink-500)' }} />
+          <Tooltip content={<WeekTooltip />} cursor={{ fill: 'rgb(var(--c-ink-900) / 0.07)' }} />
           <Bar dataKey="regular" stackId="a" fill="var(--peri-soft)" stroke="var(--ink-900)" strokeWidth={1.5} />
           <Bar dataKey="ot" stackId="a" fill="var(--tangerine)" stroke="var(--ink-900)" strokeWidth={1.5} />
         </BarChart>

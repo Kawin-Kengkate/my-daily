@@ -45,9 +45,9 @@ export function WeeklyTrendChart({
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} barSize={24}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--cream-300)" />
-          <XAxis dataKey="week" tick={{ fontFamily: 'inherit', fontSize: 11 }} />
-          <YAxis tick={{ fontFamily: 'inherit', fontSize: 11 }} unit="h" />
-          <Tooltip content={<TrendTooltip />} cursor={{ fill: 'var(--cream-100)' }} />
+          <XAxis dataKey="week" stroke="var(--ink-300)" tick={{ fontFamily: 'inherit', fontSize: 11, fill: 'var(--ink-500)' }} />
+          <YAxis stroke="var(--ink-300)" tick={{ fontFamily: 'inherit', fontSize: 11, fill: 'var(--ink-500)' }} unit="h" />
+          <Tooltip content={<TrendTooltip />} cursor={{ fill: 'rgb(var(--c-ink-900) / 0.07)' }} />
           <ReferenceLine
             y={weeklyTarget}
             stroke="var(--lemon)"

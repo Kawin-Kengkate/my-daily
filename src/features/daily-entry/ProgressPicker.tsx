@@ -61,7 +61,7 @@ export function ProgressPicker({ value, onChange, error, className }: ProgressPi
                   'h-8 rounded-field font-mono text-sm border-1.5 transition-all',
                   'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
                   value === p
-                    ? 'bg-tangerine border-ink-900 font-bold shadow-stamp-sm'
+                    ? 'bg-tangerine text-on-tangerine border-ink-900 font-bold shadow-stamp-sm'
                     : 'border-transparent hover:border-ink-900 hover:bg-cream-100',
                 )}
               >
@@ -76,7 +76,7 @@ export function ProgressPicker({ value, onChange, error, className }: ProgressPi
               'w-full h-8 rounded-field font-mono text-sm border-1.5 transition-all',
               'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
               value === 'complete'
-                ? 'bg-mint border-ink-900 font-bold text-ink-900 shadow-stamp-sm'
+                ? 'bg-mint border-ink-900 font-bold text-on-mint shadow-stamp-sm'
                 : 'border-transparent hover:border-ink-900 hover:bg-cream-100',
             )}
           >

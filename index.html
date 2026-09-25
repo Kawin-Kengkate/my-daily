@@ -3,7 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#FF6B35" />
+    <meta name="theme-color" content="#FF4B1F" />
+    <script>
+      // ใส่ theme ที่เลือกไว้ก่อน paint (กันจอกระพริบ) — key ต้องตรงกับ THEME_STORAGE_KEY ใน src/lib/theme.ts
+      try {
+        var savedTheme = localStorage.getItem('my-daily-theme');
+        if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+      } catch (e) {}
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="My Daily" />

@@ -70,7 +70,7 @@ export function TimePicker({ value, onChange, error, className, minuteStep = 5 }
                       className={cn(
                         'h-7 rounded-field font-mono text-sm border-1.5 shrink-0',
                         active
-                          ? 'bg-tangerine border-ink-900 font-bold'
+                          ? 'bg-tangerine text-on-tangerine border-ink-900 font-bold'
                           : 'border-transparent hover:border-ink-900 hover:bg-cream-100',
                       )}
                     >
@@ -94,7 +94,7 @@ export function TimePicker({ value, onChange, error, className, minuteStep = 5 }
                       className={cn(
                         'h-7 rounded-field font-mono text-sm border-1.5 shrink-0',
                         active
-                          ? 'bg-tangerine border-ink-900 font-bold'
+                          ? 'bg-tangerine text-on-tangerine border-ink-900 font-bold'
                           : 'border-transparent hover:border-ink-900 hover:bg-cream-100',
                       )}
                     >

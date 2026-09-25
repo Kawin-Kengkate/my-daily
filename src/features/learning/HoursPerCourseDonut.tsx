@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import type { LearningCourse, LearningSession } from '@/types/db';
 
-const PALETTE = ['#6B7FE8', '#F7C548', '#4FB389', '#FF6B35', '#F291A6', '#DCCFB6', '#A78BFA'];
+const PALETTE = ['var(--peri)', 'var(--lemon)', 'var(--mint)', 'var(--tangerine)', 'var(--rose)', 'var(--cream-300)', 'var(--peri-soft)'];
 
 export function HoursPerCourseDonut({
   sessions,
@@ -18,6 +18,7 @@ export function HoursPerCourseDonut({
     }
     return Array.from(hoursMap.entries())
       .map(([id, min], i) => ({
+        id,
         name: courses.find((c) => c.id === id)?.code ?? '?',
         fullName: courses.find((c) => c.id === id)?.name ?? id,
         value: Math.round((min / 60) * 10) / 10,
@@ -66,7 +67,7 @@ export function HoursPerCourseDonut({
       </div>
       <ul className="space-y-1 text-sm flex-1 min-w-0">
         {data.map((d) => (
-          <li key={d.name} className="flex items-center gap-2 font-mono">
+          <li key={d.id} className="flex items-center gap-2 font-mono">
             <span className="h-3 w-3 shrink-0 rounded border-1.5 border-ink-900" style={{ background: d.fill }} />
             <span className="font-bold truncate">{d.name}</span>
             <span className="text-ink-500 ml-auto shrink-0">{d.value}h</span>
