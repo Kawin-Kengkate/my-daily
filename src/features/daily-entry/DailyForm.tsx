@@ -573,7 +573,7 @@ export function DailyForm({ dateISO }: { dateISO: string }) {
 
       <div className="md:hidden h-20" />
       <div
-        className="md:hidden fixed left-0 right-0 z-40 bg-paper border-t-1.5 border-ink-900 p-3 flex items-center justify-between gap-2 shadow-[0_-3px_0_0_rgba(15,27,45,0.08)]"
+        className="md:hidden fixed left-0 right-0 z-40 bg-paper border-t-1.5 border-ink-900 p-3 flex items-center justify-between gap-2 shadow-[0_-3px_0_0_rgb(var(--c-ink-900)_/_0.08)]"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 49px)' }}
       >
         {otPreview ? (

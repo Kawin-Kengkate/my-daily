@@ -9,6 +9,7 @@ import { Field } from '@/components/Field';
 import { TimePicker } from '@/components/TimePicker';
 import { Skeleton } from '@/components/Skeleton';
 import { useSettings, useSaveSettings } from '@/hooks/useSettings';
+import { ThemeSection } from '@/features/settings/ThemeSection';
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -61,6 +62,8 @@ export function SettingsPage() {
   return (
     <div className="space-y-5 max-w-2xl mx-auto">
       <h2 className="font-display font-extrabold text-display">Settings</h2>
+
+      <ThemeSection />
 
       <Card className="p-5 space-y-4">
         <div className="flex items-center justify-between">

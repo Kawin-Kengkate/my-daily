@@ -7,7 +7,7 @@ interface Props {
   height?: number;
 }
 
-export function ProjectSparkline({ data, color = '#6B7FE8', width = 120, height = 28 }: Props) {
+export function ProjectSparkline({ data, color = 'var(--peri)', width = 120, height = 28 }: Props) {
   if (data.length < 2) {
     return <span className="font-mono text-[10px] text-ink-300">no trend</span>;
   }
@@ -23,7 +23,7 @@ export function ProjectSparkline({ data, color = '#6B7FE8', width = 120, height 
     <div className="inline-flex items-center gap-1.5">
       <svg width={width} height={height} className="overflow-visible">
         <path d={path} fill="none" stroke={color} strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx={last[0]} cy={last[1]} r={2.5} fill={color} stroke="#0F1B2D" strokeWidth={1} />
+        <circle cx={last[0]} cy={last[1]} r={2.5} fill={color} stroke="var(--ink-900)" strokeWidth={1} />
       </svg>
       <span className="font-mono text-[10px] font-bold text-ink-700">{lastValue}%</span>
     </div>

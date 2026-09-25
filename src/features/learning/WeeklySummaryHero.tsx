@@ -63,14 +63,14 @@ export function WeeklySummaryHero({ hoursLogged, weeklyTarget, activeDatesSet }:
         <div className="relative shrink-0 self-center sm:self-start">
           <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true">
             {/* Track */}
-            <circle cx="66" cy="66" r={r} fill="none" stroke="var(--cream-200, #F0E9D6)" strokeWidth="10" />
+            <circle cx="66" cy="66" r={r} fill="none" stroke="var(--cream-200)" strokeWidth="10" />
             {/* Progress arc */}
             <motion.circle
               cx="66"
               cy="66"
               r={r}
               fill="none"
-              stroke={isComplete ? 'var(--mint, #4FB389)' : 'var(--peri, #6B7FE8)'}
+              stroke={isComplete ? 'var(--mint)' : 'var(--peri)'}
               strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={c}
@@ -92,7 +92,7 @@ export function WeeklySummaryHero({ hoursLogged, weeklyTarget, activeDatesSet }:
           </div>
           {isComplete && (
             <span
-              className="absolute -top-1 -right-1 px-2 py-0.5 bg-mint text-paper border-1.5 border-ink-900 rounded-full font-display font-bold text-[10px] shadow-stamp-sm"
+              className="absolute -top-1 -right-1 px-2 py-0.5 bg-mint text-on-mint border-1.5 border-ink-900 rounded-full font-display font-bold text-[10px] shadow-stamp-sm"
               style={{ transform: 'rotate(8deg)' }}
             >
               ครบ ✓
@@ -117,7 +117,7 @@ export function WeeklySummaryHero({ hoursLogged, weeklyTarget, activeDatesSet }:
               onClick={() => navigate('/learning/new')}
               className={cn(
                 'shrink-0 flex items-center gap-1.5 px-3 py-2',
-                'bg-lemon border-1.5 border-ink-900 rounded-button shadow-stamp font-display font-bold text-sm',
+                'bg-lemon text-on-lemon border-1.5 border-ink-900 rounded-button shadow-stamp font-display font-bold text-sm',
                 'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-transform',
               )}
             >
@@ -137,7 +137,7 @@ export function WeeklySummaryHero({ hoursLogged, weeklyTarget, activeDatesSet }:
                   <div
                     className={cn(
                       'h-7 w-full rounded-md border-1.5 border-ink-900 flex items-center justify-center transition-colors',
-                      isActive ? 'bg-peri text-paper' : 'bg-cream-100 text-ink-400',
+                      isActive ? 'bg-peri text-on-peri' : 'bg-cream-100 text-ink-400',
                       isToday && !isActive && 'ring-2 ring-offset-1 ring-peri',
                       isToday && isActive && 'ring-2 ring-offset-1 ring-ink-900',
                     )}

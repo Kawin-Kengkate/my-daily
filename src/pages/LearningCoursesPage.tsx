@@ -125,7 +125,8 @@ export function LearningCoursesPage() {
           <Button
             onClick={handleSeed}
             disabled={seedCourses.isPending}
-            className="mt-5 bg-lemon border-1.5 border-ink-900 font-display font-bold shadow-stamp active:translate-x-[1px] active:translate-y-[1px] active:shadow-none gap-1.5"
+            variant="lemon"
+            className="mt-5 shadow-stamp gap-1.5"
           >
             <Sparkles size={14} />
             {seedCourses.isPending ? 'กำลังเพิ่ม…' : 'เพิ่ม starter courses'}
@@ -218,10 +219,8 @@ export function LearningCoursesPage() {
                     <Button
                       type="submit"
                       disabled={createCourse.isPending || !newName.trim() || !newCode.trim()}
-                      className={cn(
-                        'bg-lemon border-1.5 border-ink-900 font-display font-bold shadow-stamp',
-                        'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
-                      )}
+                      variant="lemon"
+                      className="shadow-stamp"
                     >
                       เพิ่ม
                     </Button>

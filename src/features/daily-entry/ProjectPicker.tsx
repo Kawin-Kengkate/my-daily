@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { projectColor } from '@/lib/projectColor';
 import type { Project } from '@/types/db';
 
 interface ProjectPickerProps {
@@ -64,7 +65,7 @@ export function ProjectPicker({
             <span className="flex items-center gap-1.5 min-w-0 overflow-hidden">
               <code
                 className="shrink-0 px-1.5 py-0.5 rounded border border-ink-900 font-mono font-bold text-[11px] text-ink-900 leading-none"
-                style={{ backgroundColor: selected.color + '30' }}
+                style={{ backgroundColor: projectColor(selected.color, 0.19) }}
               >
                 {selected.code}
               </code>
@@ -130,17 +131,17 @@ export function ProjectPicker({
                   'h-9 w-full px-2 flex items-center gap-2 rounded-field border-1.5 transition-all text-left',
                   'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
                   value === p.id
-                    ? 'bg-tangerine border-ink-900 shadow-stamp-sm'
-                    : 'border-transparent hover:border-ink-900 hover:bg-cream-100',
+                    ? 'bg-tangerine text-on-tangerine border-ink-900 shadow-stamp-sm'
+                    : 'text-ink-900 border-transparent hover:border-ink-900 hover:bg-cream-100',
                 )}
               >
-                <code
-                  className="shrink-0 px-1.5 py-0.5 rounded border border-ink-900 font-mono font-bold text-[11px] text-ink-900 leading-none"
-                  style={{ backgroundColor: p.color + '30' }}
-                >
-                  {p.code}
+                {/* chip ทึบ paper รองรับ tint สีโปรเจค — อ่านออกทั้งตอนอยู่บน tangerine (selected) */}
+                <code className="shrink-0 rounded bg-paper border border-ink-900 font-mono font-bold text-[11px] text-ink-900 leading-none">
+                  <span className="block px-1.5 py-0.5 rounded-[3px]" style={{ backgroundColor: projectColor(p.color, 0.19) }}>
+                    {p.code}
+                  </span>
                 </code>
-                <span className="truncate font-body text-sm text-ink-900">{p.name}</span>
+                <span className="truncate font-body text-sm">{p.name}</span>
               </button>
             ))}
           </div>

@@ -47,6 +47,11 @@
   - `mint` = complete/positive
   - `peri` = projects/info/avatar
   - `rose` = leave/sensitive
+- **Themes (5 ชุด: pop default / neon dark / bubblegum / matcha / classic):** สีทั้งหมดมาจาก CSS vars ใน `src/styles/globals.css`
+  - **ห้าม hex ใน component** — inline style / SVG ใช้ `var(--peri)`, `var(--ink-900)`, `var(--stamp)`; สีโปรเจคใช้ `projectColor()`
+  - **พื้น accent ทึบ (`bg-tangerine/lemon/mint/peri/rose`) ต้องคู่ `text-on-{accent}`** — ห้าม `text-paper`/`text-ink-900` (dark theme พัง)
+  - `bg-ink-900` คู่ `text-paper` ได้ / พื้น `-soft` หรือ `/alpha` ใช้ `text-ink-*` ได้
+  - แก้/เพิ่มสี → `npm test` (`theme.test.ts` เช็ค token ครบ + contrast + ΔE)
 - **Custom primitives** (port จาก `mocks/src/shared.jsx`): `<Sticker>`, `<Pill>`, `<ProjectCode>`, `<Star4>`, `<Burst>`, `<Squiggle>`, `<Field>` + (planned for Learning) `<Arc>`, `<DotGrid>` — ใช้สิ่งเหล่านี้แทนการ inline class
 - **อย่าใช้ shadcn `<Calendar>` สำหรับ heatmap** — สร้าง custom grid `grid-cols-7 gap-1` แทน (Calendar shadcn ใช้แค่ date picker ปกติ)
 
@@ -98,11 +103,13 @@ src/
     useLearningCourses, useLearningSessions, useLearningNudge   (planned)
   lib/                     — pure utils
     ot.ts, ot.test.ts
+    theme.ts, theme.test.ts   — theme list + contrast test (parse globals.css)
+    projectColor.ts          — project hex (DB) → theme token
     thai-holidays.ts
     date.ts, format.ts
     learning.ts, learning.test.ts                   (planned — aggregate, nudge logic)
   types/                   — db.ts (map กับ Supabase schema)
-  styles/                  — globals.css (copy จาก design_handoff + shadcn base)
+  styles/                  — globals.css (theme tokens ทุก theme = source of truth ของสี)
 ```
 
 **กฎ:**

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ProjectCode } from '@/components/ProjectCode';
+import { projectColor } from '@/lib/projectColor';
 import type { Project } from '@/types/db';
 
 interface Props {
@@ -31,7 +32,7 @@ export function NoTimelineBucket({ projects }: Props) {
           >
             <span
               className="h-2 w-2 rounded-full border border-ink-900 shrink-0"
-              style={{ background: p.color }}
+              style={{ background: projectColor(p.color) }}
             />
             <ProjectCode code={p.code} />
             <span className="text-ink-700">{p.name}</span>

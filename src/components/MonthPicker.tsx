@@ -68,7 +68,7 @@ export function MonthPicker({ value, onChange, className }: Props) {
                   className={cn(
                     'h-9 rounded-field font-body text-sm border-1.5 transition-all',
                     isSel
-                      ? 'bg-tangerine border-ink-900 font-bold shadow-stamp-sm'
+                      ? 'bg-tangerine text-on-tangerine border-ink-900 font-bold shadow-stamp-sm'
                       : 'border-transparent hover:border-ink-900 hover:bg-cream-100',
                   )}
                 >

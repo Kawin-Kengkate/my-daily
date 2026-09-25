@@ -17,14 +17,14 @@ interface LevelStyle {
 const levelConfig: Record<'celebrate' | 'info' | 'warning' | 'urgent', LevelStyle> = {
   celebrate: {
     bg: 'bg-mint/25',
-    accent: 'bg-mint text-paper',
+    accent: 'bg-mint text-on-mint',
     Icon: PartyPopper,
     text: (hrs) => `เป้าสัปดาห์นี้ครบแล้ว ${hrs.toFixed(1)} ชม. ✓`,
     showCTA: false,
   },
   info: {
     bg: 'bg-peri/15',
-    accent: 'bg-peri text-paper',
+    accent: 'bg-peri text-on-peri',
     Icon: Sparkles,
     text: (hrs, target) =>
       hrs === 0 ? 'สัปดาห์นี้ยังไม่ได้ log learning เลย' : `เรียนไป ${hrs.toFixed(1)} / ${target} ชม.`,
@@ -32,7 +32,7 @@ const levelConfig: Record<'celebrate' | 'info' | 'warning' | 'urgent', LevelStyl
   },
   warning: {
     bg: 'bg-lemon/30',
-    accent: 'bg-lemon text-ink-900',
+    accent: 'bg-lemon text-on-lemon',
     Icon: Zap,
     text: (_h, target, remaining) =>
       `ขาดอีก ${remaining.toFixed(1)} ชม. จะครบ ${target} ชม./สัปดาห์`,
@@ -40,7 +40,7 @@ const levelConfig: Record<'celebrate' | 'info' | 'warning' | 'urgent', LevelStyl
   },
   urgent: {
     bg: 'bg-tangerine/20',
-    accent: 'bg-tangerine text-paper',
+    accent: 'bg-tangerine text-on-tangerine',
     Icon: Flame,
     text: (_h, target, remaining) =>
       `วันสุดท้าย — ขาดอีก ${remaining.toFixed(1)} ชม. (เป้า ${target} ชม.)`,

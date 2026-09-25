@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { projectColor } from '@/lib/projectColor';
 
 const bgMap = {
   peri: 'bg-peri-soft',
@@ -31,7 +32,7 @@ export function ProjectCode({
         !hexColor && bgMap[color],
         className,
       )}
-      style={hexColor ? { backgroundColor: hexColor + '30' } : undefined}
+      style={hexColor ? { backgroundColor: projectColor(hexColor, 0.19) } : undefined}
     >
       {code}
     </code>

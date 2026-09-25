@@ -8,11 +8,11 @@ interface LocationToggleProps {
 }
 
 const LOCATION_CONFIG: Record<LocationKind, { label: string; activeClass: string }> = {
-  onsite:   { label: 'Onsite',   activeClass: 'bg-mint border-ink-900 text-ink-900 shadow-stamp-sm' },
-  wfh:      { label: 'WFH',      activeClass: 'bg-peri border-ink-900 text-paper shadow-stamp-sm' },
-  leave:    { label: 'ลา',       activeClass: 'bg-rose border-ink-900 text-ink-900 shadow-stamp-sm' },
-  training: { label: 'Training', activeClass: 'bg-tangerine border-ink-900 text-ink-900 shadow-stamp-sm' },
-  holiday:  { label: 'Holiday',  activeClass: 'bg-lemon border-ink-900 text-ink-900 shadow-stamp-sm' },
+  onsite:   { label: 'Onsite',   activeClass: 'bg-mint border-ink-900 text-on-mint shadow-stamp-sm' },
+  wfh:      { label: 'WFH',      activeClass: 'bg-peri border-ink-900 text-on-peri shadow-stamp-sm' },
+  leave:    { label: 'ลา',       activeClass: 'bg-rose border-ink-900 text-on-rose shadow-stamp-sm' },
+  training: { label: 'Training', activeClass: 'bg-tangerine border-ink-900 text-on-tangerine shadow-stamp-sm' },
+  holiday:  { label: 'Holiday',  activeClass: 'bg-lemon border-ink-900 text-on-lemon shadow-stamp-sm' },
 };
 
 const INACTIVE = 'bg-cream-50 border-ink-900 text-ink-700 hover:bg-cream-200';

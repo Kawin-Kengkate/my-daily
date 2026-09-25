@@ -1,6 +1,7 @@
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { ProjectCode } from '@/components/ProjectCode';
+import { projectColor } from '@/lib/projectColor';
 import { Pill } from '@/components/Pill';
 import type { Project } from '@/types/db';
 import type { ProjectTimelineData } from '@/lib/timeline';
@@ -31,7 +32,7 @@ export function TimelineCountdownCard({ project: p, data, today }: Props) {
       <div className="flex items-center gap-2 mb-2.5 min-w-0">
         <span
           className="h-2.5 w-2.5 rounded-full border-1.5 border-ink-900 shrink-0"
-          style={{ background: p.color }}
+          style={{ background: projectColor(p.color) }}
         />
         <ProjectCode code={p.code} />
         <span className="font-body text-sm text-ink-900 truncate">{p.name}</span>
@@ -42,7 +43,7 @@ export function TimelineCountdownCard({ project: p, data, today }: Props) {
         <div className="h-2 bg-cream-200 rounded-full mb-2.5 border-1.5 border-ink-900 overflow-hidden">
           <div
             className="h-full rounded-full transition-all"
-            style={{ width: `${progressPct}%`, background: p.color }}
+            style={{ width: `${progressPct}%`, background: projectColor(p.color) }}
           />
         </div>
       )}

@@ -2,6 +2,7 @@
 
 > Hi-fi design system สำหรับ My Daily (personal daily log + OT dashboard)
 > Visual direction: **Playful — cream base, hard-shadow stamps, warm accents, big numeric tickers**
+> + **5 color themes** (Pop Riot default, Neon Night dark, Bubblegum, Matcha, Classic Cream) — ดู §2
 
 ---
 
@@ -16,30 +17,67 @@
 
 ## 2. Color system
 
-Cream base + ink + **4 accent ที่มีบทบาทเจาะจง** + 1 soft (rose)
+**Themeable** — 5 theme, token ชุดเดียวกัน, สลับได้ที่ Settings → 🎨 Theme หรือปุ่ม palette บน header
+(เก็บใน `localStorage['my-daily-theme']` ต่อเครื่อง)
 
-| Token | Hex | OKLCH | Role |
-|---|---|---|---|
-| `cream-50` | `#FBF6EC` | — | Lightest surface (cards inner / hovers) |
-| `cream-100` | `#F5EFE4` | — | **Canvas / page bg** |
-| `cream-200` | `#ECE3D2` | — | Inactive chips, dividers |
-| `cream-300` | `#DCCFB6` | — | Strong border, "etc" project chip |
-| `paper` | `#FFFCF5` | — | **Card surface** (most cards) |
-| `ink-900` | `#0F1B2D` | — | **Primary text, all 1.5px borders** |
-| `ink-700` | `#2A3A52` | — | Secondary text |
-| `ink-500` | `#5C6A80` | — | Muted text, labels |
-| `ink-300` | `#9AA6B8` | — | Disabled / placeholder |
-| `ink-200` | `#C6CDDB` | — | Light divider |
-| `tangerine` | `#FF6B35` | — | **OT / money / urgent** (3x rate, OT bars, salary CTAs) |
-| `tangerine-soft` | `#FFD8C7` | — | OT background fill, 1.5x bar fill on holidays |
-| `lemon` | `#F7C548` | — | **Holiday / highlight / "next"** |
-| `lemon-soft` | `#FCEDBD` | — | Holiday bg, holiday-row stripe in OT table |
-| `mint` | `#4FB389` | — | **Complete / positive / synced** |
-| `mint-soft` | `#C8E8D7` | — | Onsite chip, complete bg |
-| `peri` | `#6B7FE8` | — | **Projects / info / user avatar** |
-| `peri-soft` | `#D7DCFA` | — | WFH chip, project primary bg |
-| `rose` | `#F291A6` | — | **Leave / soft sensitive** (salary lock sticker) |
-| `rose-soft` | `#FBD7DE` | — | Leave chip bg |
+| Theme id | ชื่อ | Vibe |
+|---|---|---|
+| `pop` (**default**) | 🍭 Pop Riot | ครีมสด + ส้มแดงจัด + ม่วงไฟฟ้า, ink ม่วงเข้ม |
+| `neon` | 🌃 Neon Night | dark — พื้นคราม, เส้นขาวลาเวนเดอร์, accent นีออน, **เงา stamp ชมพูแมกเจนต้า** |
+| `bubblegum` | 🫧 Bubblegum | ชมพูลูกกวาด + ม่วงองุ่น |
+| `matcha` | 🍵 Matcha | เขียวชา + ส้มอิฐ สบายตา |
+| `classic` | 📜 Classic Cream | palette ต้นฉบับของ handoff นี้ (ค่าเดิมทุกตัว) |
+
+**Source of truth = `src/styles/globals.css`** (`[data-theme='<id>']` blocks) — hex ของแต่ละ theme อยู่ในคอมเมนต์ข้างค่า
+- เก็บเป็น channel `R G B` (`--c-peri: 91 61 245`) → Tailwind ใช้ `rgb(var(--c-peri) / <alpha-value>)` ทำให้ `bg-peri/20` ใช้ได้
+- inline style / SVG ใช้ตัวแปรสีเต็ม `var(--peri)`, `var(--ink-900)`, `var(--stamp)` — **ห้ามใส่ hex ใน component**
+- `src/lib/theme.test.ts` เช็คทุก theme: token ครบ, contrast (ดูข้างล่าง), ΔE ของสีพื้น location ≥ 10
+
+### Tokens (ทุก theme ต้องมีครบ)
+
+| Token | Role |
+|---|---|
+| `cream-50` | Lightest surface (field bg / hovers) |
+| `cream-100` | **Canvas / page bg** (+ dot-grid texture สี ink 7%) |
+| `cream-200` | Inactive chips, dividers, holiday cell |
+| `cream-300` | Strong divider, chart grid |
+| `paper` | **Card surface** |
+| `ink-900` | **Primary text, all 1.5px borders** |
+| `ink-700` / `ink-600` | Secondary text |
+| `ink-500` / `ink-400` | Muted text, labels |
+| `ink-300` / `ink-200` | Disabled / placeholder / light divider |
+| `tangerine` (+`-soft`) | **OT / money / urgent** |
+| `lemon` (+`-soft`) | **Holiday / highlight / "next"** |
+| `mint` (+`-soft`) | **Complete / positive / synced** |
+| `peri` (+`-soft`) | **Projects / info / user avatar** |
+| `rose` (+`-soft`) | **Leave / soft sensitive** |
+| `on-tangerine` `on-lemon` `on-mint` `on-peri` `on-rose` | **ตัวหนังสือ/ไอคอนบนพื้น accent ทึบ** |
+| `stamp` | สีเงา hard shadow (`shadow-stamp*`) — `neon` = ชมพู, theme อื่น = ink-900 |
+
+### กฎ on-color (สำคัญ)
+
+พื้น accent ทึบ (`bg-tangerine`, `bg-lemon`, `bg-mint`, `bg-peri`, `bg-rose`) **ต้องคู่กับ `text-on-{accent}` เสมอ**
+— ห้ามใช้ `text-paper` / `text-ink-900` / ปล่อย inherit เพราะ dark theme กลับขาว-ดำ แต่ accent ยังสว่าง
+
+```tsx
+<span className="bg-lemon text-on-lemon">…</span>   // ✓
+<span className="bg-lemon text-ink-900">…</span>    // ✗ ขาวบนเหลืองใน neon
+```
+
+- พื้น `-soft` และพื้น `/alpha` (`bg-mint/20`) ใช้ `text-ink-*` ได้ตามปกติ
+- พื้นกลับสี `bg-ink-900` ใช้ `text-paper` (ทำงานถูกทั้ง light/dark)
+- element ที่มีพื้น `bg-paper` ซ้อนอยู่ใน accent ทึบ ต้องใส่ `text-ink-900` เอง (ไม่งั้นได้ on-color ที่ inherit มา)
+
+### Contrast ที่ test บังคับ
+
+| คู่สี | ขั้นต่ำ |
+|---|---|
+| `ink-900` บน `paper` / `cream-50` / `cream-100` | 7 |
+| `ink-700`, `ink-500` บน surface เดียวกัน | 4.5 |
+| `on-{accent}` บน `{accent}` | 4.5 |
+| `ink-900` บน `{accent}-soft` | 4.5 |
+| `tangerine` / `mint` / `peri` / `rose` เป็นตัวหนังสือบน `paper` | 3 (ยกเว้น `classic` ที่คงค่าต้นฉบับ) |
+| `stamp` บน `cream-100` | 3 |
 
 ### Semantic mapping
 
@@ -57,11 +95,17 @@ Cream base + ink + **4 accent ที่มีบทบาทเจาะจง**
 | Progress 1–99% | `ink-700` |
 | Money values (positive) | `tangerine` heading |
 | User avatar | `peri` solid |
-| Logo M | `tangerine` solid |
+| Logo M | `tangerine` solid + `on-tangerine` |
+
+### Project colors
+
+`projects.color` ใน DB ยังเก็บ hex ของ palette เดิม (`#6B7FE8` peri, `#4FB389` mint, `#FF6B35` tangerine,
+`#F7C548` lemon, `#F291A6` rose, `#1E1E1E` ink) — render ผ่าน `projectColor(hex, alpha)` (`src/lib/projectColor.ts`)
+ซึ่ง map กลับเป็น token → สีโปรเจคเปลี่ยนตาม theme โดยไม่ต้อง migrate
 
 ### Tailwind config
 
-ดู `tailwind.tokens.ts` — copy `extend.colors` ลง `tailwind.config.ts`
+ดู `tailwind.tokens.ts` — ทุก color ชี้ไปที่ `var(--c-*)` ไม่มี hex
 
 ---
 
@@ -143,17 +187,19 @@ Tailwind defaults work as-is. Conventions used:
 ## 6. Shadows — chunky offset signature
 
 ```css
---shadow-stamp:    4px 4px 0 0 var(--ink-900);   /* main cards, stat blocks */
---shadow-stamp-sm: 2px 2px 0 0 var(--ink-900);   /* small buttons, chips */
---shadow-stamp-3:  3px 3px 0 0 var(--ink-900);   /* medium cards */
---shadow-stamp-cta-lemon: 4px 4px 0 0 var(--lemon);  /* primary CTA "Save" */
---shadow-stamp-cta-orange: 3px 3px 0 0 var(--tangerine); /* save in dark mode */
+shadow-stamp-sm   2px 2px 0 0 rgb(var(--c-stamp))   /* small buttons, chips */
+shadow-stamp      3px 3px 0 0 rgb(var(--c-stamp))   /* medium cards */
+shadow-stamp-lg   4px 4px 0 0 rgb(var(--c-stamp))   /* main cards, stat blocks */
+shadow-stamp-lemon      4px 4px 0 0 rgb(var(--c-lemon))      /* primary CTA "Save" */
+shadow-stamp-tangerine  3px 3px 0 0 rgb(var(--c-tangerine))
 
 /* fallback soft shadow — rarely used */
---shadow-soft: 0 8px 24px -8px rgba(15,27,45,0.18);
+shadow-soft       0 8px 24px -8px rgb(var(--c-ink-900) / 0.18)
 ```
 
-**Rule**: pressed/active states translate `-1px,-1px` to "absorb" the shadow.
+`stamp` = ink-900 ในทุก light theme, ชมพูนีออนใน `neon` — inline style ใช้ `var(--stamp)`
+
+**Rule**: pressed/active states translate `1px,1px` to "absorb" the shadow.
 
 ---
 
@@ -209,12 +255,13 @@ Used for:
 
 | Variant | Bg | Text | Border | Shadow | Use |
 |---|---|---|---|---|---|
-| Primary | `ink-900` | `paper` | `ink-900` | `4px 4px 0 lemon` or `tangerine` | Save, sign in, "New project" |
-| Tangerine CTA | `tangerine` | `paper` | `ink-900` | `3px 3px 0 ink-900` | "Save day ✓" on holiday |
-| Lemon | `lemon` | `ink-900` | `ink-900` | `2px 2px 0 ink-900` | Active filter, "+ เพิ่ม" |
-| Paper | `paper` | `ink-900` | `ink-900` | `2px 2px 0 ink-900` | Secondary, filters, prev/next |
+| Primary | `ink-900` | `paper` | `ink-900` | `4px 4px 0 lemon` | Save, sign in, "New project" |
+| Tangerine CTA | `tangerine` | `on-tangerine` | `ink-900` | `3px 3px 0 stamp` | "Save day ✓" on holiday |
+| Lemon | `lemon` | `on-lemon` | `ink-900` | `2px 2px 0 stamp` | Active filter, "+ เพิ่ม", Learning primary |
+| Danger | `rose` | `on-rose` | `ink-900` | `2px 2px 0 stamp` | Destructive |
+| Paper | `paper` | `ink-900` | `ink-900` | `2px 2px 0 stamp` | Secondary, filters, prev/next |
 | Ghost | transparent | `ink-700` | none | none | Tab nav (non-active) |
-| Icon-only | `paper` | `ink-900` | `ink-900` | `2px 2px 0 ink-900` | Date prev/next on mobile |
+| Icon-only | `paper` | `ink-900` | `ink-900` | `2px 2px 0 stamp` | Date prev/next on mobile |
 
 All buttons: `font-display`, `font-weight: 600–700`, padding scales with size.
 
@@ -258,6 +305,7 @@ Motion language is **chunky + immediate** — short durations (120–180ms), tra
 [Logo M + "My Daily"]  [Dashboard | Daily | OT Table | Projects | Settings]  [sync indicator]  [avatar]
 ```
 - height: 76px (with 20px padding)
+- top: แถบ 4px 5 accent (tangerine → lemon → mint → peri → rose)
 - border-bottom: `1.5px ink-900`
 - bg: `paper`
 - active tab: `bg-ink-900 text-paper rounded-[10px]`
@@ -331,4 +379,4 @@ Motion language is **chunky + immediate** — short durations (120–180ms), tra
 | `mocks/src/Settings.jsx` | Settings |
 | `mocks/src/BrandSystem.jsx` | Brand reference card |
 | `mocks/src/shared.jsx` | Sticker, Pill, Card, Star4, Burst, Tape, Phone |
-| `mocks/styles/tokens.css` | CSS variables source of truth |
+| `mocks/styles/tokens.css` | CSS variables ของ mock ต้นฉบับ (= theme `classic`) — runtime ใช้ `src/styles/globals.css` |

@@ -15,45 +15,60 @@
  *     },
  *   } satisfies Config;
  *
- * Then add the Google Fonts <link> and CSS variables from `globals.css`.
+ * Then add the Google Fonts <link> and the theme CSS variables from `src/styles/globals.css`
+ * (ทุก color ชี้ไปที่ var(--c-*) — ไม่มี hex ในไฟล์นี้แล้ว).
  */
+
+// สีทั้งหมดอ่านจาก CSS variables (channel "R G B") ที่ src/styles/globals.css — เปลี่ยน theme = สลับชุด var
+// <alpha-value> ทำให้ opacity modifier ใช้ได้ เช่น bg-peri/20
+const c = (token: string) => `rgb(var(--c-${token}) / <alpha-value>)`;
 
 export const myDailyTokens = {
   colors: {
     cream: {
-      50:  '#FBF6EC',
-      100: '#F5EFE4',
-      200: '#ECE3D2',
-      300: '#DCCFB6',
+      50:  c('cream-50'),
+      100: c('cream-100'),   // page canvas
+      200: c('cream-200'),
+      300: c('cream-300'),
     },
-    paper: '#FFFCF5',
+    paper: c('paper'),       // card surface
     ink: {
-      200: '#C6CDDB',
-      300: '#9AA6B8',
-      500: '#5C6A80',
-      700: '#2A3A52',
-      900: '#0F1B2D',
+      200: c('ink-200'),
+      300: c('ink-300'),
+      400: c('ink-400'),
+      500: c('ink-500'),
+      600: c('ink-600'),
+      700: c('ink-700'),
+      900: c('ink-900'),     // primary text + ทุก border
     },
     // Semantic accents — every accent has a job
     tangerine: {
-      DEFAULT: '#FF6B35',   // OT / money / urgent (3x rate, salary CTAs)
-      soft:    '#FFD8C7',
+      DEFAULT: c('tangerine'),  // OT / money / urgent (3x rate, salary CTAs)
+      soft:    c('tangerine-soft'),
     },
     lemon: {
-      DEFAULT: '#F7C548',   // holiday / highlight / next
-      soft:    '#FCEDBD',
+      DEFAULT: c('lemon'),      // holiday / highlight / next
+      soft:    c('lemon-soft'),
     },
     mint: {
-      DEFAULT: '#4FB389',   // complete / positive / synced
-      soft:    '#C8E8D7',
+      DEFAULT: c('mint'),       // complete / positive / synced
+      soft:    c('mint-soft'),
     },
     peri: {
-      DEFAULT: '#6B7FE8',   // projects / info / user avatar
-      soft:    '#D7DCFA',
+      DEFAULT: c('peri'),       // projects / info / user avatar
+      soft:    c('peri-soft'),
     },
     rose: {
-      DEFAULT: '#F291A6',   // leave / soft sensitive
-      soft:    '#FBD7DE',
+      DEFAULT: c('rose'),       // leave / soft sensitive
+      soft:    c('rose-soft'),
+    },
+    // ตัวหนังสือบนพื้น accent ทึบ — ห้ามใช้ text-paper / text-ink-900 บน bg-{accent}
+    on: {
+      tangerine: c('on-tangerine'),
+      lemon:     c('on-lemon'),
+      mint:      c('on-mint'),
+      peri:      c('on-peri'),
+      rose:      c('on-rose'),
     },
   },
 
@@ -88,21 +103,26 @@ export const myDailyTokens = {
     'card-lg': '16px',
   },
 
+  // ring-offset-* default เป็น #fff — ให้ตาม surface ของ theme (สำคัญกับ dark theme)
+  ringOffsetColor: {
+    DEFAULT: 'rgb(var(--c-paper))',
+  },
+
   borderWidth: {
     1.5: '1.5px',  // signature border on every card/button
   },
 
   boxShadow: {
     // Chunky offset stamp shadows — the signature look
-    'stamp-sm':       '2px 2px 0 0 var(--ink-900)',
-    'stamp':          '3px 3px 0 0 var(--ink-900)',
-    'stamp-lg':       '4px 4px 0 0 var(--ink-900)',
-    'stamp-lemon':    '4px 4px 0 0 var(--lemon)',
-    'stamp-tangerine':'3px 3px 0 0 var(--tangerine)',
-    'stamp-mint':     '3px 3px 0 0 var(--mint)',
-    'stamp-tangerine-lg':'4px 4px 0 0 var(--tangerine)',
+    'stamp-sm':       '2px 2px 0 0 rgb(var(--c-stamp))',
+    'stamp':          '3px 3px 0 0 rgb(var(--c-stamp))',
+    'stamp-lg':       '4px 4px 0 0 rgb(var(--c-stamp))',
+    'stamp-lemon':    '4px 4px 0 0 rgb(var(--c-lemon))',
+    'stamp-tangerine':'3px 3px 0 0 rgb(var(--c-tangerine))',
+    'stamp-mint':     '3px 3px 0 0 rgb(var(--c-mint))',
+    'stamp-tangerine-lg':'4px 4px 0 0 rgb(var(--c-tangerine))',
     // Soft fallback — use sparingly
-    soft:             '0 8px 24px -8px rgba(15,27,45,0.18)',
+    soft:             '0 8px 24px -8px rgb(var(--c-ink-900) / 0.18)',
   },
 
   rotate: {

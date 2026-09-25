@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import type { DayWithEntries, Project } from '@/types/db';
 
-const PALETTE = ['#6B7FE8', '#F7C548', '#4FB389', '#FF6B35', '#F291A6', '#DCCFB6'];
+const PALETTE = ['var(--peri)', 'var(--lemon)', 'var(--mint)', 'var(--tangerine)', 'var(--rose)', 'var(--cream-300)'];
 
 export function ProjectDonut({ days, projects }: { days: DayWithEntries[]; projects: Project[] }) {
   const data = useMemo(() => {
@@ -10,6 +10,7 @@ export function ProjectDonut({ days, projects }: { days: DayWithEntries[]; proje
     for (const d of days) for (const e of d.entries) counts.set(e.project_id, (counts.get(e.project_id) ?? 0) + 1);
     return Array.from(counts.entries())
       .map(([id, n], i) => ({
+        id,
         name: projects.find((p) => p.id === id)?.code ?? '?',
         value: n,
         fill: PALETTE[i % PALETTE.length],
@@ -37,7 +38,7 @@ export function ProjectDonut({ days, projects }: { days: DayWithEntries[]; proje
       </div>
       <ul className="space-y-1 text-sm">
         {data.map((d) => (
-          <li key={d.name} className="flex items-center gap-2 font-mono">
+          <li key={d.id} className="flex items-center gap-2 font-mono">
             <span className="h-3 w-3 rounded border-1.5 border-ink-900" style={{ background: d.fill }} />
             <span className="font-bold">{d.name}</span>
             <span className="text-ink-500">{d.value}</span>

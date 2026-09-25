@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
+import { ThemeMenu } from '@/components/ThemeMenu';
 
 type Module = 'work' | 'learning';
 
@@ -32,6 +33,8 @@ const LEARNING_NAV: NavItemDef[] = [
   { to: '/learning/new', label: 'Log Session', Icon: Plus },
   { to: '/learning/courses', label: 'Courses', Icon: BookOpen },
 ];
+
+const ACCENT_STRIPE = ['bg-tangerine', 'bg-lemon', 'bg-mint', 'bg-peri', 'bg-rose'] as const;
 
 function useCurrentModule(): Module {
   const { pathname } = useLocation();
@@ -73,7 +76,7 @@ function ModuleSwitcher({ compact = false }: { compact?: boolean }) {
             onClick={() => navigate(m === 'work' ? '/' : '/learning')}
             className={cn(
               'relative px-3 py-1 rounded-full font-display font-bold uppercase tracking-wide transition-colors',
-              active ? 'text-paper' : 'text-ink-600 hover:text-ink-900',
+              active ? (m === 'learning' ? 'text-on-peri' : 'text-paper') : 'text-ink-600 hover:text-ink-900',
             )}
           >
             {active && (
@@ -103,7 +106,9 @@ function TopNavItem(item: NavItemDef & { accent: Module }) {
       end={end}
       className={cn(
         'relative px-3 py-1.5 rounded-button font-display font-semibold text-sm whitespace-nowrap transition-colors inline-flex items-center gap-1.5',
-        isActive ? 'text-paper' : 'text-ink-700 hover:bg-cream-100',
+        isActive
+          ? accent === 'learning' ? 'text-on-peri' : 'text-paper'
+          : 'text-ink-700 hover:bg-cream-100',
       )}
     >
       {isActive && (
@@ -161,6 +166,12 @@ export function AppShell() {
   return (
     <div className="min-h-full">
       <header className="sticky top-0 z-30 bg-paper border-b-1.5 border-ink-900 shadow-stamp-sm">
+        {/* แถบ 5 accent ของ theme ปัจจุบัน */}
+        <div aria-hidden="true" className="flex h-1">
+          {ACCENT_STRIPE.map((bg) => (
+            <span key={bg} className={cn('flex-1', bg)} />
+          ))}
+        </div>
         {/* Row 1: brand + module switcher + actions */}
         <div className="max-w-6xl mx-auto flex items-center gap-3 md:gap-4 px-5 md:px-8 py-3">
           <div className="flex items-center gap-2.5 pr-1">
@@ -176,6 +187,7 @@ export function AppShell() {
                 {user.email}
               </span>
             )}
+            <ThemeMenu />
             <NavLink
               to="/settings"
               className={({ isActive }) =>
@@ -208,7 +220,7 @@ export function AppShell() {
       {/* Mobile bottom nav — contextual to current module */}
       <nav
         aria-label="Primary"
-        className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-paper border-t-1.5 border-ink-900 shadow-[0_-2px_0_0_rgba(15,27,45,0.06)]"
+        className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-paper border-t-1.5 border-ink-900 shadow-[0_-2px_0_0_rgb(var(--c-ink-900)_/_0.06)]"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div
