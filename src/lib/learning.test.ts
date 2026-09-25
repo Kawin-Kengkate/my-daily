@@ -1,17 +1,18 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { parseISO } from 'date-fns';
 import { isoWeekKey, aggregateWeek, computeNudge, buildWeeklyTrend, buildHeatmap } from './learning';
 
 describe('isoWeekKey', () => {
   it('returns correct ISO week key', () => {
-    expect(isoWeekKey(new Date('2026-01-05'))).toBe('2026-W02');
+    expect(isoWeekKey(parseISO('2026-01-05'))).toBe('2026-W02');
   });
 
   it('handles year boundary — 2025-12-29 is ISO week 2026-W01', () => {
-    expect(isoWeekKey(new Date('2025-12-29'))).toBe('2026-W01');
+    expect(isoWeekKey(parseISO('2025-12-29'))).toBe('2026-W01');
   });
 
   it('handles year boundary — 2026-01-04 is ISO week 2026-W01', () => {
-    expect(isoWeekKey(new Date('2026-01-04'))).toBe('2026-W01');
+    expect(isoWeekKey(parseISO('2026-01-04'))).toBe('2026-W01');
   });
 });
 
@@ -23,13 +24,13 @@ describe('aggregateWeek', () => {
   ];
 
   it('sums duration of sessions in the given week', () => {
-    const weekKey = isoWeekKey(new Date('2026-05-26'));
+    const weekKey = isoWeekKey(parseISO('2026-05-26'));
     const result = aggregateWeek(sessions, weekKey);
     expect(result.hours).toBeCloseTo(2.5);
   });
 
   it('counts unique active days', () => {
-    const weekKey = isoWeekKey(new Date('2026-05-26'));
+    const weekKey = isoWeekKey(parseISO('2026-05-26'));
     const result = aggregateWeek(sessions, weekKey);
     expect(result.activeDays).toBe(2);
   });
@@ -45,7 +46,7 @@ describe('aggregateWeek', () => {
       { date: '2026-05-26', duration_min: 60 },
       { date: '2026-05-26', duration_min: 30 },
     ];
-    const weekKey = isoWeekKey(new Date('2026-05-26'));
+    const weekKey = isoWeekKey(parseISO('2026-05-26'));
     const result = aggregateWeek(s2, weekKey);
     expect(result.hours).toBeCloseTo(1.5);
     expect(result.activeDays).toBe(1); // same day → 1 active day
@@ -111,6 +112,18 @@ describe('computeNudge', () => {
 });
 
 describe('buildWeeklyTrend', () => {
+  // buildWeeklyTrend นับย้อนจาก "วันนี้" — ตรึงนาฬิกาไว้ ไม่งั้น test พังเมื่อเวลาผ่านไป
+  const setToday = (y: number, m: number, d: number) => vi.setSystemTime(new Date(y, m - 1, d, 10, 0, 0));
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    setToday(2026, 5, 28); // พฤ. 2026-W22
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('returns correct number of weeks', () => {
     const result = buildWeeklyTrend([], 8);
     expect(result).toHaveLength(8);
@@ -120,11 +133,46 @@ describe('buildWeeklyTrend', () => {
     expect(buildWeeklyTrend([], 4)).toHaveLength(4);
   });
 
+  it('ends at the current ISO week', () => {
+    const result = buildWeeklyTrend([], 8);
+    expect(result[0].week).toBe('W15');
+    expect(result[7].week).toBe('W22');
+  });
+
   it('aggregates sessions into correct weeks', () => {
-    const sessions = [{ date: '2026-05-26', duration_min: 120 }];
+    const sessions = [
+      { date: '2026-05-26', duration_min: 120 }, // W22
+      { date: '2026-05-25', duration_min: 30 },  // W22 (จันทร์)
+      { date: '2026-05-24', duration_min: 45 },  // W21 (อาทิตย์)
+    ];
     const result = buildWeeklyTrend(sessions, 8);
-    const totalHours = result.reduce((sum, w) => sum + w.hours, 0);
-    expect(totalHours).toBeCloseTo(2);
+    expect(result[7]).toEqual({ week: 'W22', hours: 2.5 });
+    expect(result[6]).toEqual({ week: 'W21', hours: 0.8 });
+    expect(result.reduce((sum, w) => sum + w.hours, 0)).toBeCloseTo(3.3);
+  });
+
+  it('ignores sessions outside the window', () => {
+    const sessions = [
+      { date: '2026-03-30', duration_min: 600 }, // W14 — เก่ากว่า 8 สัปดาห์
+      { date: '2026-06-01', duration_min: 600 }, // W23 — อนาคต
+    ];
+    expect(buildWeeklyTrend(sessions, 8).every((w) => w.hours === 0)).toBe(true);
+  });
+
+  it('handles the new-year boundary (2025-12-29 belongs to 2026-W01)', () => {
+    setToday(2026, 1, 2); // ศ. 2026-W01
+    const sessions = [
+      { date: '2025-12-29', duration_min: 60 }, // 2026-W01
+      { date: '2026-01-02', duration_min: 30 }, // 2026-W01
+      { date: '2025-12-26', duration_min: 90 }, // 2025-W52
+      { date: '2025-01-02', duration_min: 999 }, // 2025-W01 — ปีก่อน เลข week ซ้ำ ต้องไม่ถูกนับ
+    ];
+    const result = buildWeeklyTrend(sessions, 3);
+    expect(result).toEqual([
+      { week: 'W51', hours: 0 },
+      { week: 'W52', hours: 1.5 },
+      { week: 'W1', hours: 1.5 },
+    ]);
   });
 });
 
